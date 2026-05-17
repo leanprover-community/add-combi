@@ -12,16 +12,19 @@ public import Mathlib.Data.Set.Insert
 /-!
 # Sidon sets
 
-This file defines the predicates `IsMulSidon` and `IsAddSidon` for sets in
-commutative monoids. A set is additively Sidon if whenever `a + b = c + d` for
-elements `a`, `b`, `c`, `d` of the set, then either `a = c` and `b = d`, or
-`a = d` and `b = c`. The two elements in each pair are not required to be
-distinct.
+This file defines the multiplicative predicate `IsMulSidon` for sets in
+commutative monoids, and the additive predicate `IsAddSidon` generated from it.
+A set is multiplicatively Sidon if whenever `a * b = c * d` for elements `a`,
+`b`, `c`, `d` of the set, then either `a = c` and `b = d`, or `a = d` and
+`b = c`. Additively, products are replaced by sums. The two elements in each
+pair are not required to be distinct.
 
 ## Main declarations
 
 * `IsMulSidon` / `IsAddSidon`: the Sidon predicates for a set.
 * `IsMulSidon.mono` / `IsAddSidon.mono`: subsets of Sidon sets are Sidon.
+* `isMulSidon_empty` / `isAddSidon_empty`: the empty set is Sidon.
+* `isMulSidon_singleton` / `isAddSidon_singleton`: singletons are Sidon.
 * `Set.Subsingleton.isMulSidon` / `Set.Subsingleton.isAddSidon`: subsingleton
   sets are Sidon.
 * `isMulSidon_iUnion` / `isAddSidon_iUnion`: directed unions of Sidon sets are
@@ -38,6 +41,9 @@ public section
 
 variable {G : Type*}
 
+/-- A set `A` is multiplicatively Sidon if whenever `a * b = c * d` for elements
+`a`, `b`, `c`, `d` of `A`, then either `a = c` and `b = d`, or `a = d` and
+`b = c`. The two elements in each pair are not required to be distinct. -/
 @[to_additive
 /-- A set `A` is additively Sidon if whenever `a + b = c + d` for elements
 `a`, `b`, `c`, `d` of `A`, then either `a = c` and `b = d`, or `a = d` and
