@@ -70,7 +70,7 @@ protected theorem IsMulSidon.empty : IsMulSidon (∅ : Set G) := by
 
 /-- A subsingleton set is Sidon. -/
 @[to_additive]
-theorem IsMulSidon.of_subsingleton (hA : A.Subsingleton) : IsMulSidon A := by
+protected theorem IsMulSidon.of_subsingleton (hA : A.Subsingleton) : IsMulSidon A := by
   intro a ha b hb c hc d hd _
   exact Or.inl ⟨hA ha hc, hA hb hd⟩
 
