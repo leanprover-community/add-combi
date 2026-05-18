@@ -23,14 +23,15 @@ pair are not required to be distinct.
 
 * `IsMulSidon` / `IsAddSidon`: the Sidon predicates for a set.
 * `IsMulSidon.mono` / `IsAddSidon.mono`: subsets of Sidon sets are Sidon.
-* `isMulSidon_empty` / `isAddSidon_empty`: the empty set is Sidon.
-* `isMulSidon_singleton` / `isAddSidon_singleton`: singletons are Sidon.
-* `Set.Subsingleton.isMulSidon` / `Set.Subsingleton.isAddSidon`: subsingleton
+* `IsMulSidon.empty` / `IsAddSidon.empty`: the empty set is Sidon.
+* `IsMulSidon.singleton` / `IsAddSidon.singleton`: singletons are Sidon.
+* `IsMulSidon.of_subsingleton` / `IsAddSidon.of_subsingleton`: subsingleton
   sets are Sidon.
-* `isMulSidon_iUnion` / `isAddSidon_iUnion`: directed unions of Sidon sets are
+* `IsMulSidon.iUnion` / `IsAddSidon.iUnion`: directed unions of Sidon sets are
   Sidon.
-* `isMulSidon_pair` / `isAddSidon_pair`: pairs in torsion-free groups are
-  Sidon.
+* `IsMulSidon.sUnion` / `IsAddSidon.sUnion`: directed unions of sets of Sidon
+  sets are Sidon.
+* `IsMulSidon.pair` / `IsAddSidon.pair`: pairs in torsion-free groups are Sidon.
 
 ## Tags
 
@@ -64,30 +65,26 @@ theorem IsMulSidon.mono (hAB : A ⊆ B) (hB : IsMulSidon B) : IsMulSidon A := by
 
 /-- The empty set is Sidon. -/
 @[to_additive (attr := simp)]
-theorem isMulSidon_empty : IsMulSidon (∅ : Set G) := by
+protected theorem IsMulSidon.empty : IsMulSidon (∅ : Set G) := by
   simp [IsMulSidon]
 
 /-- A subsingleton set is Sidon. -/
 @[to_additive]
-theorem Set.Subsingleton.isMulSidon (hA : A.Subsingleton) : IsMulSidon A := by
+theorem IsMulSidon.of_subsingleton (hA : A.Subsingleton) : IsMulSidon A := by
   intro a ha b hb c hc d hd _
   exact Or.inl ⟨hA ha hc, hA hb hd⟩
 
 /-- A singleton is Sidon. -/
 @[to_additive (attr := simp)]
-theorem isMulSidon_singleton (a : G) : IsMulSidon ({a} : Set G) := by
+protected theorem IsMulSidon.singleton (a : G) : IsMulSidon ({a} : Set G) := by
   simp [IsMulSidon]
 
 /-- A directed union of Sidon sets is Sidon. -/
 @[to_additive]
-theorem isMulSidon_iUnion {ι : Sort*} {A : ι → Set G} (hA : Directed (· ⊆ ·) A)
+protected theorem IsMulSidon.iUnion {ι : Sort*} {A : ι → Set G} (hA : Directed (· ⊆ ·) A)
     (h : ∀ i, IsMulSidon (A i)) : IsMulSidon (⋃ i, A i) := by
-  intro a ha b hb c hc d hd hprod
-  rw [Set.mem_iUnion] at ha hb hc hd
-  obtain ⟨i, hai⟩ := ha
-  obtain ⟨j, hbj⟩ := hb
-  obtain ⟨k, hck⟩ := hc
-  obtain ⟨l, hdl⟩ := hd
+  simp only [IsMulSidon, Set.mem_iUnion]
+  rintro a ⟨i, hai⟩ b ⟨j, hbj⟩ c ⟨k, hck⟩ d ⟨l, hdl⟩ hprod
   obtain ⟨ij, hiij, hjij⟩ := hA i j
   obtain ⟨ijk, hijijk, hkijk⟩ := hA ij k
   obtain ⟨ijkl, hijkijkl, hlijkl⟩ := hA ijk l
@@ -96,10 +93,10 @@ theorem isMulSidon_iUnion {ι : Sort*} {A : ι → Set G} (hA : Directed (· ⊆
 
 /-- A directed union of Sidon sets is Sidon. -/
 @[to_additive]
-theorem isMulSidon_sUnion {S : Set (Set G)} (hS : DirectedOn (· ⊆ ·) S)
+protected theorem IsMulSidon.sUnion {S : Set (Set G)} (hS : DirectedOn (· ⊆ ·) S)
     (h : ∀ A ∈ S, IsMulSidon A) : IsMulSidon (⋃₀ S) := by
   rw [Set.sUnion_eq_iUnion]
-  exact isMulSidon_iUnion (directedOn_iff_directed.mp hS) fun A ↦ h A.1 A.2
+  exact IsMulSidon.iUnion (directedOn_iff_directed.mp hS) fun A ↦ h A.1 A.2
 
 end CommMonoid
 
@@ -108,8 +105,8 @@ section CommGroup
 variable [CommGroup G] [IsMulTorsionFree G]
 
 /-- A pair in a torsion-free group is Sidon. -/
-@[to_additive]
-theorem isMulSidon_pair (a b : G) : IsMulSidon ({a, b} : Set G) := by
+@[to_additive /-- A pair in a torsion-free group is Sidon. -/]
+protected theorem IsMulSidon.pair (a b : G) : IsMulSidon ({a, b} : Set G) := by
   intro x hx y hy z hz w hw hprod
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy hz hw
   rcases hx with rfl | rfl <;> rcases hy with rfl | rfl <;>
