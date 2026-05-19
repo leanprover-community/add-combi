@@ -21,17 +21,7 @@ pair are not required to be distinct.
 
 ## Main declarations
 
-* `IsMulSidon` / `IsAddSidon`: the Sidon predicates for a set.
-* `IsMulSidon.mono` / `IsAddSidon.mono`: subsets of Sidon sets are Sidon.
-* `IsMulSidon.empty` / `IsAddSidon.empty`: the empty set is Sidon.
-* `IsMulSidon.singleton` / `IsAddSidon.singleton`: singletons are Sidon.
-* `IsMulSidon.of_subsingleton` / `IsAddSidon.of_subsingleton`: subsingleton
-  sets are Sidon.
-* `IsMulSidon.iUnion` / `IsAddSidon.iUnion`: directed unions of Sidon sets are
-  Sidon.
-* `IsMulSidon.sUnion` / `IsAddSidon.sUnion`: directed unions of sets of Sidon
-  sets are Sidon.
-* `IsMulSidon.pair` / `IsAddSidon.pair`: pairs in torsion-free groups are Sidon.
+* `IsMulSidon`/`IsAddSidon`: Predicates for a set to be Sidon.
 
 ## Tags
 
@@ -58,29 +48,29 @@ section CommMonoid
 variable [CommMonoid G] {A B : Set G}
 
 /-- A subset of a Sidon set is Sidon. -/
-@[to_additive (attr := gcongr), gcongr]
+@[to_additive (attr := gcongr) /-- A subset of an additive Sidon set is Sidon. -/, gcongr]
 theorem IsMulSidon.mono (hAB : A ⊆ B) (hB : IsMulSidon B) : IsMulSidon A := by
   intro a ha b hb c hc d hd hprod
   exact hB (hAB ha) (hAB hb) (hAB hc) (hAB hd) hprod
 
 /-- The empty set is Sidon. -/
-@[to_additive (attr := simp)]
+@[to_additive (attr := simp) /-- The empty set is additively Sidon. -/]
 protected theorem IsMulSidon.empty : IsMulSidon (∅ : Set G) := by
   simp [IsMulSidon]
 
 /-- A subsingleton set is Sidon. -/
-@[to_additive]
+@[to_additive /-- A subsingleton set is additively Sidon. -/]
 protected theorem IsMulSidon.of_subsingleton (hA : A.Subsingleton) : IsMulSidon A := by
   intro a ha b hb c hc d hd _
   exact Or.inl ⟨hA ha hc, hA hb hd⟩
 
 /-- A singleton is Sidon. -/
-@[to_additive (attr := simp)]
+@[to_additive (attr := simp) /-- A singleton is additively Sidon. -/]
 protected theorem IsMulSidon.singleton (a : G) : IsMulSidon ({a} : Set G) := by
   simp [IsMulSidon]
 
 /-- A directed union of Sidon sets is Sidon. -/
-@[to_additive]
+@[to_additive /-- A directed union of additively Sidon sets is additively Sidon. -/]
 protected theorem IsMulSidon.iUnion {ι : Sort*} {A : ι → Set G} (hA : Directed (· ⊆ ·) A)
     (h : ∀ i, IsMulSidon (A i)) : IsMulSidon (⋃ i, A i) := by
   simp only [IsMulSidon, Set.mem_iUnion]
@@ -92,7 +82,7 @@ protected theorem IsMulSidon.iUnion {ι : Sort*} {A : ι → Set G} (hA : Direct
     (hijkijkl (hkijk hck)) (hlijkl hdl) hprod
 
 /-- A directed union of Sidon sets is Sidon. -/
-@[to_additive]
+@[to_additive /-- A directed union of additively Sidon sets is additively Sidon. -/]
 protected theorem IsMulSidon.sUnion {S : Set (Set G)} (hS : DirectedOn (· ⊆ ·) S)
     (h : ∀ A ∈ S, IsMulSidon A) : IsMulSidon (⋃₀ S) := by
   rw [Set.sUnion_eq_iUnion]
