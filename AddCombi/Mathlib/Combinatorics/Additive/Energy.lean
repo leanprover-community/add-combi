@@ -122,10 +122,10 @@ lemma mulEnergy'_eq_zero_iff : Eₘ[s, t] = 0 ↔ s = ∅ ∨ t = ∅ := by
   simp [← zero_le.not_lt_iff_eq', imp_iff_or_not, or_comm]
 
 @[to_additive] lemma mulEnergy'_self_pos_iff : 0 < Eₘ[s] ↔ s.Nonempty := by
-  rw [mulEnergy'_pos_iff, and_self_iff]
+  simp
 
 @[to_additive] lemma mulEnergy'_self_eq_zero_iff : Eₘ[s] = 0 ↔ s = ∅ := by
-  rw [mulEnergy'_eq_zero_iff, or_self_iff]
+  simp
 
 lemma addEnergy'_eq_card_filter {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G]
     (s t : Finset G) :
@@ -165,13 +165,13 @@ lemma addEnergy'_eq_sum_sq {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G] 
     E[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 + xy.2 = a} ^ 2) / Fintype.card G ^ 3 := by
   rw [addEnergy'_eq_sum_sq']
   congr 2
-  exact Fintype.sum_subset <| by aesop (add simp [filter_eq_empty_iff, add_mem_add])
+  exact Fintype.sum_subset <| by simp
 
 @[to_additive existing] lemma mulEnergy'_eq_sum_sq (s t : Finset G) :
     Eₘ[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 * xy.2 = a} ^ 2) / Fintype.card G ^ 3 := by
   rw [mulEnergy'_eq_sum_sq']
   congr 2
-  exact Fintype.sum_subset <| by aesop (add simp [filter_eq_empty_iff, mul_mem_mul])
+  exact Fintype.sum_subset <| by simp
 
 @[to_additive card_sq_le_card_mul_addEnergy']
 lemma card_sq_le_card_mul_mulEnergy' (s t u : Finset G) :
@@ -226,8 +226,7 @@ lemma mulEnergy'_univ_left : Eₘ[univ, t] = t.dens ^ 2 := by
   simp only [mem_filter, mem_product, mem_univ, true_and, mem_image,
     Prod.exists]
   refine ⟨fun h => ⟨a.1.1 * a.2.2⁻¹, _, _, h.1, by simp [f, mul_right_comm, h.2]⟩, ?_⟩
-  rintro ⟨b, c, d, hcd, rfl⟩
-  simpa [f, mul_right_comm]
+  grind
 
 @[to_additive (attr := simp)]
 lemma mulEnergy'_univ_right : Eₘ[s, univ] = s.dens ^ 2 := by
