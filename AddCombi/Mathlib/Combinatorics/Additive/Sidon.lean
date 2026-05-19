@@ -48,7 +48,8 @@ section CommMonoid
 variable [CommMonoid G] {A B : Set G}
 
 /-- A subset of a Sidon set is Sidon. -/
-@[to_additive (attr := gcongr) /-- A subset of an additive Sidon set is Sidon. -/, gcongr]
+@[to_additive (attr := gcongr) /-- A subset of an additively Sidon set is additively Sidon. -/,
+  gcongr]
 theorem IsMulSidon.mono (hAB : A ⊆ B) (hB : IsMulSidon B) : IsMulSidon A := by
   intro a ha b hb c hc d hd hprod
   exact hB (hAB ha) (hAB hb) (hAB hc) (hAB hd) hprod
@@ -95,7 +96,7 @@ section CommGroup
 variable [CommGroup G] [IsMulTorsionFree G]
 
 /-- A pair in a torsion-free group is Sidon. -/
-@[to_additive /-- A pair in a torsion-free group is Sidon. -/]
+@[to_additive /-- A pair in a torsion-free group is additively Sidon. -/]
 protected theorem IsMulSidon.pair (a b : G) : IsMulSidon ({a, b} : Set G) := by
   intro x hx y hy z hz w hw hprod
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx hy hz hw
