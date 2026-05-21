@@ -7,7 +7,6 @@ module
 
 public import AddCombi.Convolution.Finite.Defs
 
-import AddCombi.Mathlib.Algebra.Order.BigOperators.Expect
 import Mathlib.Algebra.Order.Star.Conjneg
 import Mathlib.Analysis.Complex.Order
 

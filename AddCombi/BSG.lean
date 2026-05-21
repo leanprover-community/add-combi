@@ -10,9 +10,7 @@ public import Mathlib.Data.Real.Basic
 
 import AddCombi.Convolution.Finite.Order
 import AddCombi.Mathlib.Algebra.Star.Pi
-import AddCombi.Mathlib.Algebra.Order.BigOperators.Expect
 import AddCombi.Mathlib.Algebra.Order.GroupWithZero.Indicator
-import AddCombi.Mathlib.Data.Rat.Cast.Order
 import Mathlib.Algebra.BigOperators.Field
 import Mathlib.Algebra.Group.Pointwise.Finset.Density
 import Mathlib.Data.Finset.CastCard

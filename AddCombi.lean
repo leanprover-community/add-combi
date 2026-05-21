@@ -9,10 +9,8 @@ public import AddCombi.Mathlib.Algebra.Group.Action.Pointwise.Finset
 public import AddCombi.Mathlib.Algebra.Group.Action.Pointwise.Set.Basic
 public import AddCombi.Mathlib.Algebra.GroupWithZero.Indicator
 public import AddCombi.Mathlib.Algebra.Notation.Indicator
-public import AddCombi.Mathlib.Algebra.Order.BigOperators.Expect
 public import AddCombi.Mathlib.Algebra.Order.GroupWithZero.Indicator
 public import AddCombi.Mathlib.Algebra.Star.Pi
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
 public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.NNRat.Order
-public import AddCombi.Mathlib.Data.Rat.Cast.Order
