@@ -6,13 +6,10 @@ Authors: Yaël Dillies, Ella Yu
 module
 
 public import AddCombi.Mathlib.Data.Finset.Density
-public import Mathlib.Algebra.Order.Ring.Star
-public import Mathlib.Algebra.Order.BigOperators.Ring.Finset
-public import Mathlib.Data.Finset.Prod
-public import Mathlib.Data.Fintype.Prod
-public import Mathlib.Algebra.Group.Pointwise.Finset.Basic
-public import Mathlib.Data.Rat.Star
+public import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+public import Mathlib.Combinatorics.Additive.Convolution
 
+import Mathlib.Algebra.Order.BigOperators.Ring.Finset
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.Positivity
 
@@ -38,7 +35,7 @@ The following notations are defined in the `Combinatorics.Additive` scope:
 ## TODO
 
 It's possibly interesting to have
-`(s ×ˢ s) ×ˢ t ×ˢ t).filter (fun x : (M × M) × M × M ↦ x.1.1 * x.2.1 = x.1.2 * x.2.2)`
+`(s ×ˢ s) ×ˢ t ×ˢ t).filter (fun x : (G × G) × G × G ↦ x.1.1 * x.2.1 = x.1.2 * x.2.2)`
 (whose density in `G × G × G` is `mulEnergy' s t`) as a standalone definition.
 -/
 
@@ -46,11 +43,11 @@ open scoped BigOperators Pointwise
 
 public section
 
-variable {M : Type*} [Fintype M] [DecidableEq M]
+variable {G : Type*} [Fintype G] [DecidableEq G]
 
 namespace Finset
-section Monoid
-variable [Monoid M] {s s₁ s₂ t t₁ t₂ : Finset M}
+section Group
+variable [Group G] {s s₁ s₂ t t₁ t₂ : Finset G}
 
 /-- The multiplicative energy `Eₘ[s, t]` of two finsets `s` and `t` in a group is the number of
 quadruples `(a₁, a₂, b₁, b₂) ∈ s × s × t × t` such that `a₁ * b₁ = a₂ * b₂`.
@@ -61,8 +58,8 @@ The notation `Eₘ[s, t]` is available in scope `Combinatorics.Additive`. -/
 `(a₁, a₂, b₁, b₂) ∈ s × s × t × t` such that `a₁ + b₁ = a₂ + b₂`.
 
 The notation `E[s, t]` is available in scope `Combinatorics.Additive`. -/]
-def mulEnergy' (s t : Finset M) : ℚ≥0 :=
-  #{x ∈ ((s ×ˢ s) ×ˢ t ×ˢ t) | x.1.1 * x.2.1 = x.1.2 * x.2.2} / Fintype.card M ^ 3
+def mulEnergy' (s t : Finset G) : ℚ≥0 :=
+  #{x ∈ ((s ×ˢ s) ×ˢ t ×ˢ t) | x.1.1 * x.2.1 = x.1.2 * x.2.2} / Fintype.card G ^ 3
 
 /-- The multiplicative energy of two finsets `s` and `t` in a group is the number of quadruples
 `(a₁, a₂, b₁, b₂) ∈ s × s × t × t` such that `a₁ * b₁ = a₂ * b₂`. -/
@@ -92,14 +89,14 @@ lemma mulEnergy'_mono (hs : s₁ ⊆ s₂) (ht : t₁ ⊆ t₂) : Eₘ[s₁, t�
 @[to_additive] lemma mulEnergy'_mono_right (ht : t₁ ⊆ t₂) : Eₘ[s, t₁] ≤ Eₘ[s, t₂] :=
   mulEnergy'_mono Subset.rfl ht
 
-@[to_additive] lemma dens_mul_dens_le_mulEnergy' : s.dens * t.dens / Fintype.card M ≤ Eₘ[s, t] := by
+@[to_additive] lemma dens_mul_dens_le_mulEnergy' : s.dens * t.dens / Fintype.card G ≤ Eₘ[s, t] := by
   rw [← dens_product]
   simp only [dens, ← Nat.cast_mul, Fintype.card_prod, div_div, mulEnergy', pow_succ, pow_zero,
     one_mul]
   gcongr
   exact card_le_card_of_injOn (fun x => ((x.1, x.1), x.2, x.2)) (by simp [Set.MapsTo]) (by simp)
 
-@[to_additive] lemma dens_sq_le_mulEnergy'_self : s.dens ^ 2 / Fintype.card M ≤ Eₘ[s] :=
+@[to_additive] lemma dens_sq_le_mulEnergy'_self : s.dens ^ 2 / Fintype.card G ≤ Eₘ[s] :=
   sq s.dens ▸ dens_mul_dens_le_mulEnergy'
 
 @[to_additive] lemma mulEnergy'_pos (hs : s.Nonempty) (ht : t.Nonempty) : 0 < Eₘ[s, t] := by
@@ -130,54 +127,54 @@ lemma mulEnergy'_eq_zero_iff : Eₘ[s, t] = 0 ↔ s = ∅ ∨ t = ∅ := by
 @[to_additive] lemma mulEnergy'_self_eq_zero_iff : Eₘ[s] = 0 ↔ s = ∅ := by
   rw [mulEnergy'_eq_zero_iff, or_self_iff]
 
-lemma addEnergy'_eq_card_filter {M : Type*} [Fintype M] [DecidableEq M] [AddMonoid M]
-    (s t : Finset M) :
+lemma addEnergy'_eq_card_filter {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G]
+    (s t : Finset G) :
     E[s, t] =
-      #{x ∈ ((s ×ˢ t) ×ˢ s ×ˢ t) | x.1.1 + x.1.2 = x.2.1 + x.2.2} / Fintype.card M ^ 3 := by
+      #{x ∈ ((s ×ˢ t) ×ˢ s ×ˢ t) | x.1.1 + x.1.2 = x.2.1 + x.2.2} / Fintype.card G ^ 3 := by
   unfold addEnergy'
   congr 2
   exact card_equiv (.prodProdProdComm _ _ _ _) (by simp [and_and_and_comm])
 
 -- TODO: Why does `to_additive` fail here?
-@[to_additive existing] lemma mulEnergy'_eq_card_filter (s t : Finset M) :
+@[to_additive existing] lemma mulEnergy'_eq_card_filter (s t : Finset G) :
     Eₘ[s, t] =
-      #{x ∈ ((s ×ˢ t) ×ˢ s ×ˢ t) | x.1.1 * x.1.2 = x.2.1 * x.2.2} / Fintype.card M ^ 3 := by
+      #{x ∈ ((s ×ˢ t) ×ˢ s ×ˢ t) | x.1.1 * x.1.2 = x.2.1 * x.2.2} / Fintype.card G ^ 3 := by
   unfold mulEnergy'
   congr 2
   exact card_equiv (.prodProdProdComm _ _ _ _) (by simp [and_and_and_comm])
 
-lemma addEnergy'_eq_sum_sq' {M : Type*} [Fintype M] [DecidableEq M] [AddMonoid M] (s t : Finset M) :
-    E[s, t] = (∑ a ∈ s + t, #{xy ∈ s ×ˢ t | xy.1 + xy.2 = a} ^ 2) / Fintype.card M ^ 3 := by
-  simp_rw [addEnergy'_eq_card_filter, sq, ← card_product]
+lemma addEnergy'_eq_sum_sq' {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G] (s t : Finset G) :
+    E[s, t] = (∑ a ∈ s + t, s.addConvolution t a ^ 2) / Fintype.card G ^ 3 := by
+  simp_rw [addEnergy'_eq_card_filter, sq, addConvolution, ← card_product]
   rw [← card_disjiUnion]
   swap
   · aesop (add simp [Set.PairwiseDisjoint, Set.Pairwise, disjoint_left])
   · congr
     aesop (add unsafe add_mem_add)
 
-@[to_additive existing] lemma mulEnergy'_eq_sum_sq' (s t : Finset M) :
-    Eₘ[s, t] = (∑ a ∈ s * t, #{xy ∈ s ×ˢ t | xy.1 * xy.2 = a} ^ 2) / Fintype.card M ^ 3 := by
-  simp_rw [mulEnergy'_eq_card_filter, sq, ← card_product]
+@[to_additive existing] lemma mulEnergy'_eq_sum_sq' (s t : Finset G) :
+    Eₘ[s, t] = (∑ a ∈ s * t, s.convolution t a ^ 2) / Fintype.card G ^ 3 := by
+  simp_rw [mulEnergy'_eq_card_filter, sq, convolution, ← card_product]
   rw [← card_disjiUnion]
   swap
   · aesop (add simp [Set.PairwiseDisjoint, Set.Pairwise, disjoint_left])
   · congr
     aesop (add unsafe mul_mem_mul)
 
-lemma addEnergy'_eq_sum_sq {M : Type*} [Fintype M] [DecidableEq M] [AddMonoid M] (s t : Finset M) :
-    E[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 + xy.2 = a} ^ 2) / Fintype.card M ^ 3 := by
+lemma addEnergy'_eq_sum_sq {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G] (s t : Finset G) :
+    E[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 + xy.2 = a} ^ 2) / Fintype.card G ^ 3 := by
   rw [addEnergy'_eq_sum_sq']
   congr 2
   exact Fintype.sum_subset <| by aesop (add simp [filter_eq_empty_iff, add_mem_add])
 
-@[to_additive existing] lemma mulEnergy'_eq_sum_sq (s t : Finset M) :
-    Eₘ[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 * xy.2 = a} ^ 2) / Fintype.card M ^ 3 := by
+@[to_additive existing] lemma mulEnergy'_eq_sum_sq (s t : Finset G) :
+    Eₘ[s, t] = (∑ a, #{xy ∈ s ×ˢ t | xy.1 * xy.2 = a} ^ 2) / Fintype.card G ^ 3 := by
   rw [mulEnergy'_eq_sum_sq']
   congr 2
   exact Fintype.sum_subset <| by aesop (add simp [filter_eq_empty_iff, mul_mem_mul])
 
 @[to_additive card_sq_le_card_mul_addEnergy']
-lemma card_sq_le_card_mul_mulEnergy' (s t u : Finset M) :
+lemma card_sq_le_card_mul_mulEnergy' (s t u : Finset G) :
     {xy ∈ s ×ˢ t | xy.1 * xy.2 ∈ u}.dens ^ 2 ≤ u.dens * Eₘ[s, t] := by
   simp only [dens, Fintype.card_prod, Nat.cast_mul, mulEnergy'_eq_sum_sq', Nat.cast_sum,
     Nat.cast_pow]
@@ -192,7 +189,7 @@ lemma card_sq_le_card_mul_mulEnergy' (s t u : Finset M) :
         refine mul_le_mul_right (sum_le_sum_of_ne_zero ?_) _
         aesop (add simp [filter_eq_empty_iff]) (add unsafe mul_mem_mul)
 
-@[to_additive le_card_add_mul_addEnergy'] lemma le_card_mul_mul_mulEnergy' (s t : Finset M) :
+@[to_additive le_card_add_mul_addEnergy'] lemma le_card_mul_mul_mulEnergy' (s t : Finset G) :
     s.dens ^ 2 * t.dens ^ 2 ≤ (s * t).dens * Eₘ[s, t] := by
   grw [← card_sq_le_card_mul_mulEnergy']
   simp only [dens, Fintype.card_prod, Nat.cast_mul]
@@ -200,21 +197,21 @@ lemma card_sq_le_card_mul_mulEnergy' (s t u : Finset M) :
   norm_cast
   rw [filter_eq_self.2, card_product, mul_pow]; aesop (add unsafe mul_mem_mul)
 
-end Monoid
+end Group
 
 open scoped Combinatorics.Additive'
 
-section CommMonoid
-variable [CommMonoid M]
+section CommGroup
+variable [CommGroup G]
 
-@[to_additive] lemma mulEnergy'_comm (s t : Finset M) : Eₘ[s, t] = Eₘ[t, s] := by
+@[to_additive] lemma mulEnergy'_comm (s t : Finset G) : Eₘ[s, t] = Eₘ[t, s] := by
   rw [mulEnergy', ← Finset.card_map (Equiv.prodComm _ _).toEmbedding, map_filter]
   simp [-Finset.card_map, mulEnergy', mul_comm, map_eq_image]
 
-end CommMonoid
+end CommGroup
 
 section CommGroup
-variable [CommGroup M] (s t : Finset M)
+variable [CommGroup G] (s t : Finset G)
 
 @[to_additive (attr := simp)]
 lemma mulEnergy'_univ_left : Eₘ[univ, t] = t.dens ^ 2 := by
@@ -222,8 +219,8 @@ lemma mulEnergy'_univ_left : Eₘ[univ, t] = t.dens ^ 2 := by
   field_simp
   norm_cast
   simp only [Fintype.card, sq, ← card_product]
-  let f : M × M × M → (M × M) × M × M := fun x => ((x.1 * x.2.2, x.1 * x.2.1), x.2)
-  have : (↑((univ : Finset M) ×ˢ t ×ˢ t) : Set (M × M × M)).InjOn f := by aesop
+  let f : G × G × G → (G × G) × G × G := fun x => ((x.1 * x.2.2, x.1 * x.2.1), x.2)
+  have : (↑((univ : Finset G) ×ˢ t ×ˢ t) : Set (G × G × G)).InjOn f := by aesop
   rw [← card_image_of_injOn this]
   congr with a
   simp only [mem_filter, mem_product, mem_univ, true_and, mem_image,

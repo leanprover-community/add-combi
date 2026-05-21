@@ -5,8 +5,8 @@ Authors: Yaël Dillies
 -/
 module
 
-public import AddCombi.Mathlib.Algebra.Group.Action.Pointwise.Finset
 public import AddCombi.Mathlib.Algebra.Notation.Indicator
+public import AddCombi.Mathlib.Combinatorics.Additive.Convolution
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
 public import Mathlib.Algebra.Group.Action.Pointwise.Finset
 public import Mathlib.Algebra.Group.Translate
@@ -74,7 +74,7 @@ lemma conv_apply (f g : G → K) (a : G) :
 
 lemma conv_eq_smul_sum (f g : G → K) (a : G) :
     (f ∗ g) a = (∑ x : G × G with x.1 + x.2 = a, f x.1 * g x.2) /ℚ Fintype.card G := by
-  simp [conv_apply, expect, ← univ_product_univ, ← card_inter_vadd_neg_eq_card_filter]
+  simp [conv_apply, expect, ← univ_product_univ, card_add_eq]
 
 @[simp] lemma conv_zero (f : G → K) : f ∗ 0 = 0 := by ext; simp [conv_apply]
 @[simp] lemma zero_conv (f : G → K) : 0 ∗ f = 0 := by ext; simp [conv_apply]
@@ -210,7 +210,7 @@ lemma dconv_apply (f g : G → K) (a : G) :
 
 lemma dconv_eq_smul_sum (f g : G → K) (a : G) :
     (f ○ g) a = (∑ x : G × G with x.1 - x.2 = a, f x.1 * conj g x.2) /ℚ Fintype.card G := by
-  simp [dconv_apply, expect, ← univ_product_univ, ← card_inter_vadd_eq_card_filter]
+  simp [dconv_apply, expect, ← univ_product_univ, card_sub_eq]
 
 @[simp] lemma conv_conjneg (f g : G → K) : f ∗ conjneg g = f ○ g :=
   funext fun a ↦ expect_bij (fun x _ ↦ (x.1, -x.2)) (fun x hx ↦ by simpa using hx) (fun x _ ↦ rfl)
@@ -334,6 +334,12 @@ lemma indicator_one_dconv_indicator_one_eq_dens (s t : Finset G) (a : G) :
   simp [dconv_indicator_one, Set.indicator_apply, NNRat.smul_def, dens, div_eq_inv_mul,
     ← filter_mem_eq_inter, ← neg_vadd_mem_iff, sub_eq_add_neg]
 
+lemma indicator_one_dconv_indicator_one_eq_addConvolution_div (s t : Finset G) (a : G) :
+    (𝟭_[s, K] ○ 𝟭_[t]) a = s.addConvolution (-t) a / card G := by
+  rw [indicator_one_dconv_indicator_one_eq_dens, dens, card_inter_vadd]
+  push_cast
+  rfl
+
 lemma expect_indicator_one_dconv_indicator_one (s t : Finset G) :
     𝔼 a, (𝟭_[(s : Set G), K] ○ 𝟭_[t]) a = s.dens * t.dens := by
   simp [expect_dconv, Set.conj_indicator_one_apply]
@@ -345,7 +351,7 @@ lemma expect_indicator_one_dconv_indicator_sq (s t : Finset G) :
         #{x ∈ (s ×ˢ s) ×ˢ t ×ˢ t | x.1.1 + x.2.1 = x.1.2 + x.2.2} by
     simp only [expect, card_univ, indicator_one_dconv_indicator_one_eq_dens, dens, NNRat.cast_div,
       NNRat.cast_natCast, sq, div_mul_div_comm, ← sum_div, NNRat.smul_def, NNRat.cast_inv,
-      addEnergy', NNRat.cast_pow, card_inter_vadd_eq_card_filter]
+      addEnergy', NNRat.cast_pow, card_inter_vadd, ← card_sub_eq]
     field_simp
     norm_cast
   simp only [card_eq_sum_ones, sq, Finset.sum_mul_sum, sum_filter, sum_product, boole_mul,
