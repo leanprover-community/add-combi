@@ -280,42 +280,23 @@ lemma lemma_one' {c K : ℝ} (hc : 0 < c) (hK : 0 < K) (hE : K⁻¹ * (A.dens ^ 
 end lemma1
 
 section lemma2
-
-open Pointwise
-
-lemma many_pairs {K : ℝ} {x : G} (hab : (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) x) :
-    A.dens / (2 ^ 4 * K ^ 2 : ℝ) ≤ #((B ×ˢ B).filter fun ⟨c, d⟩ ↦ c - d = x) / card G :=
-  calc
-    _ = (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens := by ring
-    _ ≤ (𝟭_[B] ○ 𝟭_[B]) x := hab
-    _ ≤ #((B ×ˢ B).filter fun ⟨c, d⟩ ↦ c - d = x) / card G := by
-      rw [indicator_one_dconv_indicator_one_eq_dens, dens, card_inter_vadd_eq_card_filter]
-      push_cast
-      rfl
-
 variable {H : Finset (G × G)} {X : Finset G}
-
-lemma quadruple_bound_part {K : ℝ} (a c : G)
-    (hac : (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (a - c)) :
-    A.dens / (2 ^ 4 * K ^ 2) ≤
-      #((B ×ˢ B).filter fun ⟨a₁, a₂⟩ ↦ a₁ - a₂ = a - c) / card G :=
-  many_pairs hac
 
 lemma quadruple_bound_other {a b c : G} {K : ℝ} {H : Finset (G × G)}
     (hac : (a, c) ∈ H) (hbc : (b, c) ∈ H)
-    (hH : ∀ x ∈ H, (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
+    (hH : ∀ x ∈ H, A.dens / (2 ^ 4 * K ^ 2) ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
     (A.dens / (2 ^ 4 * K ^ 2)) ^ 2 ≤ #(((B ×ˢ B) ×ˢ B ×ˢ B).filter fun ⟨⟨a₁, a₂⟩, a₃, a₄⟩ ↦
         a₁ - a₂ = a - c ∧ a₃ - a₄ = b - c) / card G ^ 2 := by
   rw [filter_product (s := B ×ˢ B) (t := B ×ˢ B) (fun z ↦ z.1 - z.2 = a - c)
     (fun z ↦ z.1 - z.2 = b - c), card_product, sq, sq (card G : ℝ), Nat.cast_mul,
       mul_div_mul_comm]
   gcongr ?_ * ?_
-  · convert quadruple_bound_part _ _ (hH _ hac)
-  · convert quadruple_bound_part _ _ (hH _ hbc)
+  · grw [card_sub_eq, hH _ hac, indicator_one_dconv_indicator_one_eq_addConvolution_div]
+  · grw [card_sub_eq, hH _ hbc, indicator_one_dconv_indicator_one_eq_addConvolution_div]
 
 lemma quadruple_bound_left {a b : G} {K : ℝ} {H : Finset (G × G)}
     (ha : a ∈ oneOfPair H X) (hb : b ∈ oneOfPair H X)
-    (hH : ∀ x ∈ H, (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
+    (hH : ∀ x ∈ H, A.dens / (2 ^ 4 * K ^ 2) ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
     X.dens / 2 * (A.dens / (2 ^ 4 * K ^ 2)) ^ 2 ≤
       #({c ∈ X | (a, c) ∈ H ∧ (b, c) ∈ H}.sigma fun c ↦
       ((B ×ˢ B) ×ˢ B ×ˢ B).filter fun ⟨⟨a₁, a₂⟩, a₃, a₄⟩ ↦
@@ -336,7 +317,7 @@ lemma quadruple_bound_left {a b : G} {K : ℝ} {H : Finset (G × G)}
     _ = _ := by rw [card_sigma, Nat.cast_sum, ← sum_div]; ring
 
 lemma quadruple_bound {K : ℝ} {x : G} (hx : x ∈ oneOfPair H X - oneOfPair H X)
-    (hH : ∀ x ∈ H, (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
+    (hH : ∀ x ∈ H, A.dens / (2 ^ 4 * K ^ 2) ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2)) :
     (A.dens ^ 2 * X.dens) / (2 ^ 9 * K ^ 4) ≤
       #(((B ×ˢ B) ×ˢ B ×ˢ B).filter fun ⟨⟨a₁, a₂⟩, a₃, a₄⟩ ↦ (a₁ - a₂) - (a₃ - a₄) = x) /
       card G ^ 3 := by
@@ -347,7 +328,7 @@ lemma quadruple_bound {K : ℝ} {x : G} (hx : x ∈ oneOfPair H X - oneOfPair H 
   ring
 
 lemma big_quadruple_bound {K : ℝ}
-    (hH : ∀ x ∈ H, (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2))
+    (hH : ∀ x ∈ H, A.dens / (2 ^ 4 * K ^ 2) ≤ (𝟭_[B] ○ 𝟭_[B]) (x.1 - x.2))
     (hX : A.dens / (2 * K) ≤ X.dens) :
     (oneOfPair H X - oneOfPair H X).dens * (A.dens ^ 3 / (2 ^ 10 * K ^ 5)) ≤ B.dens ^ 4 :=
   calc
@@ -376,12 +357,15 @@ lemma BSG_aux {K : ℝ} (hK : 0 < K) (hA : A.Nonempty) (hB : B.Nonempty)
       (A' - A').dens ≤ 2 ^ 10 * K ^ 5 * B.dens ^ 4 / A.dens ^ 3 := by
   obtain ⟨x, X, hX₁, hX₂, hX₃⟩ := lemma_one' (c := 1 / 8) (by norm_num) hK hAB hA hB
   set H : Finset (G × G) := (X ×ˢ X).filter
-    fun ⟨a, b⟩ ↦ (1 / 8 : ℝ) / 2 * (K ^ 2)⁻¹ * A.dens ≤ (𝟭_[B] ○ 𝟭_[B]) (a - b)
+    fun ⟨a, b⟩ ↦ A.dens / (2 ^ 4 * K ^ 2) ≤ (𝟭_[B] ○ 𝟭_[B]) (a - b)
   have : (0 : ℝ) < X.dens := hX₂.trans_lt' (by positivity)
   refine ⟨x, oneOfPair H X, (filter_subset _ _).trans hX₁, ?_, ?_⟩
   · rw [← mul_inv, inv_mul_eq_div]
-    exact oneOfPair_bound (filter_subset _ _) (by simpa using this) (hX₃.trans_eq' (by norm_num))
-      hX₂
+    refine oneOfPair_bound (filter_subset _ _) (by simpa using this) ?_ hX₂
+    convert hX₃ using 2
+    · norm_num
+    · unfold H
+      ring_nf
   have := big_quadruple_bound (H := H) (fun x hx ↦ (mem_filter.1 hx).2) hX₂
   rw [le_div_iff₀ (by positivity)]
   rw [mul_div_assoc', div_le_iff₀ (by positivity)] at this

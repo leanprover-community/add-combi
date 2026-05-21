@@ -7,8 +7,10 @@ module
 
 public import AddCombi.Convolution.Finite.Defs
 
+import Mathlib.Algebra.Order.Ring.Star
 import Mathlib.Algebra.Order.Star.Conjneg
 import Mathlib.Analysis.Complex.Order
+import Mathlib.Data.Rat.Star
 
 public section
 
