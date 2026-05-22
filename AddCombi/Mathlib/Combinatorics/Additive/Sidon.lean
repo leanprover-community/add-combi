@@ -62,7 +62,7 @@ protected theorem IsMulSidon.empty : IsMulSidon (∅ : Set G) := by
 @[to_additive /-- A subsingleton set is additively Sidon. -/]
 protected theorem IsMulSidon.of_subsingleton (hA : A.Subsingleton) : IsMulSidon A := by
   intro a ha b hb c hc d hd _
-  exact Or.inl ⟨hA ha hc, hA hb hd⟩
+  exact .inl ⟨hA ha hc, hA hb hd⟩
 
 /-- A singleton is Sidon. -/
 @[to_additive (attr := simp) /-- A singleton is additively Sidon. -/]
