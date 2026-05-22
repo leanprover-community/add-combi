@@ -11,5 +11,6 @@ public import AddCombi.Mathlib.Algebra.Notation.Indicator
 public import AddCombi.Mathlib.Algebra.Order.GroupWithZero.Indicator
 public import AddCombi.Mathlib.Algebra.Star.Pi
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
+public import AddCombi.Mathlib.Combinatorics.Additive.Sidon
 public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.NNRat.Order
