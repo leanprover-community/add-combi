@@ -86,7 +86,7 @@ protected theorem IsMulSidon.iUnion {ι : Sort*} {A : ι → Set G} (hA : Direct
 protected theorem IsMulSidon.sUnion {S : Set (Set G)} (hS : DirectedOn (· ⊆ ·) S)
     (h : ∀ A ∈ S, IsMulSidon A) : IsMulSidon (⋃₀ S) := by
   rw [Set.sUnion_eq_iUnion]
-  exact IsMulSidon.iUnion (directedOn_iff_directed.mp hS) fun A ↦ h A.1 A.2
+  exact .iUnion hS.directed_val fun A ↦ h A.1 A.2
 
 end CommMonoid
 
