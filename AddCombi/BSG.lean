@@ -13,9 +13,9 @@ import AddCombi.Mathlib.Algebra.Star.Pi
 import AddCombi.Mathlib.Algebra.Order.GroupWithZero.Indicator
 import Mathlib.Algebra.BigOperators.Field
 import Mathlib.Algebra.Group.Pointwise.Finset.Density
+import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Data.Finset.CastCard
 import Mathlib.Data.NNRat.BigOperators
-import Mathlib.Data.Real.StarOrdered
 import Mathlib.Tactic.Positivity
 
 /-!
