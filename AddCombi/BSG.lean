@@ -394,7 +394,7 @@ public theorem BSG₂ {K : ℝ} (hK : 0 ≤ K) (hB : B.Nonempty)
   · exact ⟨∅, by simp, ∅, by simp⟩
   obtain rfl | hK := eq_or_lt_of_le hK
   · exact ⟨∅, by simp, ∅, by simp⟩
-  obtain ⟨x, A', hA, h⟩ := BSG_aux hK (by lia) (by lia) hAB
+  obtain ⟨x, A', hA, h⟩ := BSG_aux hK (by simpa [card_pos]) (by simpa [card_pos]) hAB
   refine ⟨A', hA.trans inter_subset_left, -x +ᵥ A', ?_, h.1, ?_, ?_⟩
   · grw [hA, inter_subset_right, neg_vadd_vadd]
   · simp_all

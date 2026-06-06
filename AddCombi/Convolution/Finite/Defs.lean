@@ -212,7 +212,7 @@ lemma dconv_eq_smul_sum (f g : G → K) (a : G) :
   simp [dconv_apply, expect, ← univ_product_univ, card_sub_eq]
 
 @[simp] lemma conv_conjneg (f g : G → K) : f ∗ conjneg g = f ○ g :=
-  funext fun a ↦ expect_bij (fun x _ ↦ (x.1, -x.2)) (fun x hx ↦ by simp_all) (fun x _ ↦ rfl)
+  funext fun a ↦ expect_bij (fun x _ ↦ (x.1, -x.2)) (fun x hx ↦ by simpa using hx) (fun x _ ↦ rfl)
     (fun x y _ _ h ↦ by grind) fun x hx ↦
       ⟨(x.1, -x.2), by grind, by simp⟩
 
