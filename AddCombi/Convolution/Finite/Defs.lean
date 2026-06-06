@@ -275,8 +275,8 @@ alias smul_dconv_left_comm := dconv_smul
 lemma conv_dconv_conv_comm (f g h i : G → K) : f ∗ g ○ (h ∗ i) = f ○ h ∗ (g ○ i) := by
   simp_rw [← conv_conjneg, conjneg_conv, conv_conv_conv_comm]
 
-lemma dconv_conv_dconv_comm (f g h i : G → K) : f ○ g ∗ (h ○ i) = f ∗ h ○ (g ∗ i) := by
-  simp_rw [← conv_conjneg, conjneg_conv, conv_conv_conv_comm]
+lemma dconv_conv_dconv_comm (f g h i : G → K) : f ○ g ∗ (h ○ i) = f ∗ h ○ (g ∗ i) :=
+  (conv_dconv_conv_comm f h g i).symm
 
 lemma dconv_dconv_dconv_comm (f g h i : G → K) : f ○ g ○ (h ○ i) = f ○ h ○ (g ○ i) := by
   simp_rw [← conv_conjneg, conjneg_conv, conv_conv_conv_comm]
@@ -354,9 +354,7 @@ lemma expect_indicator_one_dconv_indicator_sq (s t : Finset G) :
     norm_cast
   simp only [card_eq_sum_ones, sq, Finset.sum_mul_sum, sum_filter, sum_product, boole_mul,
     univ.sum_comm, Finset.sum_ite_eq, mem_univ, ite_true, sub_eq_sub_iff_add_eq_add]
-  congr! 2 with x _ y _
-  rw [sum_comm]
-  simp [eq_comm]
+  exact sum_comm
 
 end Semifield
 
