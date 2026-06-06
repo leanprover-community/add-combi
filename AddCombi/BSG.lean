@@ -38,7 +38,7 @@ variable {α : Type*} [Fintype α] [DecidableEq α] {H : Finset (α × α)} {A B
 omit [Fintype α] in
 lemma oneOfPair_aux (hH : H ⊆ X ×ˢ X) : #{yz ∈ H | yz.1 = x} = #{c ∈ X | (x, c) ∈ H} := by
   refine card_nbij' Prod.snd (fun c ↦ (x, c)) ?_ (by simp [Set.MapsTo])
-    (by aesop (add simp [Set.LeftInvOn])) (by simp [Set.LeftInvOn])
+    (by grind [Set.LeftInvOn]) (by simp [Set.LeftInvOn])
   simpa +contextual [Set.MapsTo, eq_comm] using fun a b hab _ ↦ (mem_product.1 (hH hab)).2
 
 noncomputable def oneOfPair (H : Finset (α × α)) (X : Finset α) : Finset α :=
@@ -52,9 +52,8 @@ lemma mem_oneOfPair :
 lemma oneOfPair_bound_one :
     (∑ x ∈ X \ oneOfPair H X, {c ∈ X | (x, c) ∈ H}.dens : ℝ) / card α ≤ (3 / 4) * X.dens ^ 2 := calc
   _ ≤ (∑ _x ∈ X \ oneOfPair H X, 3 / 4 * X.dens : ℝ) / card α := by
-    gcongr with i hi
-    simp only [oneOfPair, ← filter_not, not_le, mem_filter] at hi
-    exact hi.2.le
+    gcongr
+    grind [oneOfPair]
   _ = (X \ oneOfPair H X).dens * (3 / 4 * X.dens) := by simp [dens]; ring
   _ ≤ X.dens * (3 / 4 * X.dens) := by grw [sdiff_subset]
   _ = _ := by ring
@@ -128,8 +127,7 @@ lemma claim_two :
       (by positivity)
   simp only [← sq, ← mul_assoc, hf, expect_indicator_one_dconv_indicator_one, mul_pow, claim_one]
     at this
-  refine this.trans ?_
-  rw [mul_comm]
+  grind
 
 lemma claim_three {H : Finset (G × G)} (hH : H ⊆ A ×ˢ A) :
     𝔼 x : G, (𝟭_[A, ℝ] ○ 𝟭_[B]) x * ((A ∩ (x +ᵥ B)) ×ˢ (A ∩ (x +ᵥ B)) ∩ H).dens =
@@ -158,9 +156,7 @@ lemma claim_four (ab : G × G) :
     simp only [Set.indicator_apply, mul_boole, SetLike.mem_coe,
       ← sum_filter (· ∈ B), filter_mem_eq_inter, univ_inter]
     gcongr with i
-    split
-    · rfl
-    · exact zero_le_one
+    grind
   have : 𝔼 x : G, (𝟭_[A, ℝ] ○ 𝟭_[B]) x * (𝟭_[B] ((a, b).1 - x) * 𝟭_[B] ((a, b).2 - x)) ≤
     B.dens * 𝔼 x : G, (𝟭_[B] ((a, b).1 - x) * 𝟭_[B] ((a, b).2 - x)) := by
     rw [mul_expect]
@@ -195,10 +191,6 @@ lemma claim_six (c : ℝ) (hc : 0 ≤ c) :
     grw [this, mul_div_right_comm]; simp [dens, sq]
   have hH : ((choiceH A B c).dens : ℝ) ≤ A.dens ^ 2 := by grw [choiceH_subset]; simp [sq]
   grw [claim_five choiceH_subset, ← mul_div, this, hH]
-  obtain rfl | hA := A.eq_empty_or_nonempty
-  · simp
-  obtain rfl | hA := B.eq_empty_or_nonempty
-  · simp
   field_simp
   rfl
 
@@ -249,7 +241,6 @@ lemma lemma_one {c K : ℝ} (hc : 0 < c) (hK : 0 < K) (hE : K⁻¹ * (A.dens ^ 2
       refine le_of_mul_le_mul_left (hx.trans' ?_) hc
       exact (le_add_of_nonneg_right <| NNRat.cast_nonneg _).trans_eq' (by ring)
     grw [← sq_le_sq₀ (by positivity) (by positivity), ← this, ← hE]
-    apply le_of_eq
     -- TODO: `field_simp` doesn't know how to handle `Real.sqrt`.
     field_simp
     norm_num
@@ -369,7 +360,7 @@ lemma BSG_aux {K : ℝ} (hK : 0 < K) (hA : A.Nonempty) (hB : B.Nonempty)
   have := big_quadruple_bound (H := H) (fun x hx ↦ (mem_filter.1 hx).2) hX₂
   rw [le_div_iff₀ (by positivity)]
   rw [mul_div_assoc', div_le_iff₀ (by positivity)] at this
-  exact this.trans_eq (by ring)
+  grind
 
 end lemma2
 
@@ -382,11 +373,10 @@ public theorem BSG {K : ℝ} (hK : 0 ≤ K) (hB : B.Nonempty)
     ∃ A' ⊆ A, (2 ^ 4)⁻¹ * K⁻¹ * A.dens ≤ A'.dens ∧
       (A' - A').dens ≤ 2 ^ 10 * K ^ 5 * B.dens ^ 4 / A.dens ^ 3 := by
   obtain rfl | hA := A.eq_empty_or_nonempty
-  · exact ⟨∅, by simp⟩
+  · simp
   obtain rfl | hK := eq_or_lt_of_le hK
-  · exact ⟨∅, by simp⟩
-  · obtain ⟨x, A', hA, h⟩ := BSG_aux hK (by simpa [card_pos]) (by simpa [card_pos]) hAB
-    exact ⟨A', hA.trans inter_subset_left, h⟩
+  · simp
+  · grind [BSG_aux]
 
 /-- The **Balog-Szemerédi-Gowers theorem** for two sets.
 
@@ -407,7 +397,7 @@ public theorem BSG₂ {K : ℝ} (hK : 0 ≤ K) (hB : B.Nonempty)
   obtain ⟨x, A', hA, h⟩ := BSG_aux hK (by simpa [card_pos]) (by simpa [card_pos]) hAB
   refine ⟨A', hA.trans inter_subset_left, -x +ᵥ A', ?_, h.1, ?_, ?_⟩
   · grw [hA, inter_subset_right, neg_vadd_vadd]
-  · exact dens_vadd_finset (-x) A' ▸ h.1
+  · simp_all
   · simpa [sub_eq_add_neg, add_vadd_comm] using h.2
 
 /-- The **Balog-Szemerédi-Gowers theorem** for two sets.
@@ -415,11 +405,7 @@ public theorem BSG₂ {K : ℝ} (hK : 0 ≤ K) (hB : B.Nonempty)
 If a set `A` has large energy, then there exists a large subset `A'` of `A` of small difference. -/
 public theorem BSG_self {K : ℝ} (hK : 0 ≤ K) (hA : A.Nonempty) (hAK : K⁻¹ * A.dens ^ 3 ≤ E[A]) :
     ∃ A' ⊆ A, (2 ^ 4)⁻¹ * K⁻¹ * A.dens ≤ A'.dens ∧ (A' - A').dens ≤ 2 ^ 10 * K ^ 5 * A.dens := by
-  convert BSG hK hA ?_ using 5
-  · have := hA.dens_pos
-    field_simp
-  · ring_nf
-    assumption
+  convert BSG hK hA ?_ using 5 <;> grind
 
 /-- The **Balog-Szemerédi-Gowers theorem** for two sets.
 
@@ -431,6 +417,4 @@ public theorem BSG_self' {K : ℝ} (hK : 0 ≤ K) (hA : A.Nonempty) (hAK : K⁻�
   calc
     _ = 2 ^ 14 * K ^ 6 * ((2 ^ 4)⁻¹ * K⁻¹ * A.dens) := ?_
     _ ≤ _ := by gcongr
-  obtain rfl | hK := hK.eq_or_lt
-  · simp
-  · field_simp
+  grind

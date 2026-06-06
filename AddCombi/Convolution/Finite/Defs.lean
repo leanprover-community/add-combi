@@ -150,10 +150,10 @@ lemma conv_eq_expect_add (f g : G → K) (a : G) : (f ∗ g) a = 𝔼 t, f (a + 
     simp only [sub_eq_add_neg, Equiv.neg_apply, neg_neg]
 
 lemma conv_eq_expect_sub' (f g : G → K) (a : G) : (f ∗ g) a = 𝔼 t, f t * g (a - t) := by
-  rw [conv_comm, conv_eq_expect_sub]; simp_rw [mul_comm]
+  rw [conv_comm, conv_eq_expect_sub]; grind
 
 lemma conv_eq_expect_add' (f g : G → K) (a : G) : (f ∗ g) a = 𝔼 t, f (-t) * g (a + t) := by
-  rw [conv_comm, conv_eq_expect_add]; simp_rw [mul_comm]
+  rw [conv_comm, conv_eq_expect_add]; grind
 
 lemma conv_apply_add (f g : G → K) (a b : G) : (f ∗ g) (a + b) = 𝔼 t, f (a + t) * g (b - t) :=
   (conv_eq_expect_sub _ _ _).trans <| Fintype.expect_equiv (Equiv.subLeft b) _ _ fun t ↦ by
@@ -213,8 +213,8 @@ lemma dconv_eq_smul_sum (f g : G → K) (a : G) :
 
 @[simp] lemma conv_conjneg (f g : G → K) : f ∗ conjneg g = f ○ g :=
   funext fun a ↦ expect_bij (fun x _ ↦ (x.1, -x.2)) (fun x hx ↦ by simpa using hx) (fun x _ ↦ rfl)
-    (fun x y _ _ h ↦ by simpa [Prod.ext_iff] using h) fun x hx ↦
-      ⟨(x.1, -x.2), by simpa [sub_eq_add_neg] using hx, by simp⟩
+    (fun x y _ _ h ↦ by grind) fun x hx ↦
+      ⟨(x.1, -x.2), by grind, by simp⟩
 
 @[simp] lemma dconv_conjneg (f g : G → K) : f ○ conjneg g = f ∗ g := by
   rw [← conv_conjneg, conjneg_conjneg]
@@ -336,8 +336,7 @@ lemma indicator_one_dconv_indicator_one_eq_dens (s t : Finset G) (a : G) :
 lemma indicator_one_dconv_indicator_one_eq_addConvolution_div (s t : Finset G) (a : G) :
     (𝟭_[s, K] ○ 𝟭_[t]) a = s.addConvolution (-t) a / card G := by
   rw [indicator_one_dconv_indicator_one_eq_dens, dens, card_inter_vadd]
-  push_cast
-  rfl
+  simp
 
 lemma expect_indicator_one_dconv_indicator_one (s t : Finset G) :
     𝔼 a, (𝟭_[(s : Set G), K] ○ 𝟭_[t]) a = s.dens * t.dens := by
