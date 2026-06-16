@@ -14,7 +14,6 @@ public import Mathlib.Analysis.RCLike.Basic
 public import Mathlib.Data.Complex.Basic
 public import Mathlib.Data.NNReal.Star
 
-import AddCombi.Mathlib.Algebra.BigOperators.Expect
 import AddCombi.Mathlib.Algebra.GroupWithZero.Indicator
 import AddCombi.Mathlib.Algebra.Star.Pi
 import Mathlib.Algebra.BigOperators.Field
@@ -340,7 +339,7 @@ lemma indicator_one_dconv_indicator_one_eq_addConvolution_div (s t : Finset G) (
 
 lemma expect_indicator_one_dconv_indicator_one (s t : Finset G) :
     𝔼 a, (𝟭_[(s : Set G), K] ○ 𝟭_[t]) a = s.dens * t.dens := by
-  simp [expect_dconv, Set.conj_indicator_one_apply]
+  simp [expect_dconv, Set.conj_indicator_one_apply]; simp [← Pi.one_def]
 
 lemma expect_indicator_one_dconv_indicator_sq (s t : Finset G) :
     𝔼 x, (𝟭_[(s : Set G), K] ○ 𝟭_[t]) x ^ 2 = E[s, t] := by
