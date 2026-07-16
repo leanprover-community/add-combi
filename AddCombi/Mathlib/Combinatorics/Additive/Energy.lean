@@ -143,6 +143,7 @@ lemma addEnergy'_eq_card_filter {G : Type*} [Fintype G] [DecidableEq G] [AddGrou
   congr 2
   exact card_equiv (.prodProdProdComm _ _ _ _) (by simp [and_and_and_comm])
 
+set_option backward.isDefEq.respectTransparency false in
 lemma addEnergy'_eq_sum_sq' {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G] (s t : Finset G) :
     E[s, t] = (∑ a ∈ s + t, s.addConvolution t a ^ 2) / Fintype.card G ^ 3 := by
   simp_rw [addEnergy'_eq_card_filter, sq, addConvolution, ← card_product]
@@ -152,6 +153,7 @@ lemma addEnergy'_eq_sum_sq' {G : Type*} [Fintype G] [DecidableEq G] [AddGroup G]
   · congr
     aesop (add unsafe add_mem_add)
 
+set_option backward.isDefEq.respectTransparency false in
 @[to_additive existing] lemma mulEnergy'_eq_sum_sq' (s t : Finset G) :
     Eₘ[s, t] = (∑ a ∈ s * t, s.convolution t a ^ 2) / Fintype.card G ^ 3 := by
   simp_rw [mulEnergy'_eq_card_filter, sq, convolution, ← card_product]
