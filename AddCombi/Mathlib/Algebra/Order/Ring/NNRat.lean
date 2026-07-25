@@ -1,7 +1,7 @@
 module
 
+public import Mathlib.Algebra.Order.Ring.NNRat
 public import Mathlib.Algebra.Order.Sub.Unbundled.Basic
-public import Mathlib.Data.NNRat.Order
 public import Mathlib.Data.Rat.Cast.CharZero
 
 public section
