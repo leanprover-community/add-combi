@@ -3,7 +3,7 @@ module
 public import Mathlib.Data.Finset.Density
 public import Mathlib.Data.Fintype.Prod
 
-import AddCombi.Mathlib.Data.NNRat.Order
+import AddCombi.Mathlib.Algebra.Order.Ring.NNRat
 
 public section
 
