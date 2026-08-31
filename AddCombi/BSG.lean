@@ -6,7 +6,7 @@ Authors: Yaël Dillies, Bhavik Mehta
 module
 
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
-public import Mathlib.Data.Real.Basic
+public import Mathlib.Basic.Real.Basic
 
 import AddCombi.Convolution.Finite.Order
 import AddCombi.Mathlib.Algebra.Star.Pi

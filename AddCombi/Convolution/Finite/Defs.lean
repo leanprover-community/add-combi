@@ -11,8 +11,8 @@ public import Mathlib.Algebra.Group.Action.Pointwise.Finset
 public import Mathlib.Algebra.Group.Translate
 public import Mathlib.Algebra.Star.Conjneg
 public import Mathlib.Analysis.RCLike.Basic
-public import Mathlib.Data.Complex.Basic
-public import Mathlib.Data.NNReal.Star
+public import Mathlib.Basic.Complex.Basic
+public import Mathlib.Basic.NNReal.Star
 
 import AddCombi.Mathlib.Algebra.GroupWithZero.Indicator
 import AddCombi.Mathlib.Algebra.Star.Pi

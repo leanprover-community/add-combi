@@ -6,8 +6,7 @@ Authors: David B. Hulak
 module
 
 public import Mathlib.Algebra.Group.Torsion
-public import Mathlib.Data.Set.Lattice
-public import Mathlib.Data.Set.Insert
+public import Mathlib.Data.Set.Lattice.Bounded
 
 /-!
 # Sidon sets
