@@ -91,7 +91,7 @@ end CommMonoid
 
 section CommGroup
 
-variable [CommGroup G] [IsMulTorsionFree G]
+variable [CommGroup G] [HasUniqueRoots G]
 
 /-- A pair in a torsion-free group is Sidon. -/
 @[to_additive /-- A pair in a torsion-free group is additively Sidon. -/]
