@@ -51,7 +51,7 @@ jobs:
 
       - name: Upstreaming dashboard
         if: github.ref == 'refs/heads/master'
-        uses: leanprover-community/upstreaming-dashboard-action@d1a9fcf87a66519bca3a0d3e3d233456b3e8d0d9 # main
+        uses: leanprover-community/upstreaming-dashboard-action@d1a9fcf87a66519bca3a0d3e3d233456b3e8d0d9 # main as of 2026-09-28
         with:
           website-directory: ./website
           project-name: AddCombi
@@ -69,7 +69,7 @@ jobs:
       - name: Build project documentation
         if: github.ref == 'refs/heads/master'
         id: build-docgen
-        uses: leanprover-community/docgen-action@e731ee852903ea07cc5554357ff9e175af3578ab # main
+        uses: leanprover-community/docgen-action@e731ee852903ea07cc5554357ff9e175af3578ab # main as of 2026-09-28
         with:
           blueprint: false
           homepage: "website"
