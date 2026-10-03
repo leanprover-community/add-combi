@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
@@ -37,13 +37,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags
 
       - name: Build and lint the project
         id: build-lean
-        uses: leanprover/lean-action@f807b338d95de7813c5c50d018f1c23c9b93b4ec # v1.2.0
+        uses: leanprover/lean-action@f061402b660e0c34644504b324e830f2991d4865 # v1.6.1
 
       - name: Copy README.md to website/index.md
         if: github.ref == 'refs/heads/master'
@@ -51,7 +51,7 @@ jobs:
 
       - name: Upstreaming dashboard
         if: github.ref == 'refs/heads/master'
-        uses: leanprover-community/upstreaming-dashboard-action@main
+        uses: leanprover-community/upstreaming-dashboard-action@d1a9fcf87a66519bca3a0d3e3d233456b3e8d0d9 # main as of 2026-09-28
         with:
           website-directory: ./website
           project-name: AddCombi
@@ -69,7 +69,7 @@ jobs:
       - name: Build project documentation
         if: github.ref == 'refs/heads/master'
         id: build-docgen
-        uses: leanprover-community/docgen-action@main
+        uses: leanprover-community/docgen-action@90cab778600b5fe01899f61a640ead757388cfd2 # main as of 2026-09-28
         with:
           blueprint: false
           homepage: "website"
