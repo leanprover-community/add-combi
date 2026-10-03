@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Open or update incompatibility PR
-        uses: leanprover-community/downstream-reports/.github/actions/track-incompatibility@d0764abb5ca52756fe941e73e1e1cab4074b6047 # main as of 2026-09-28
+        uses: leanprover-community/downstream-reports/.github/actions/track-incompatibility@992989408f0e6c10d8363ece29deeaa7f2dae27f # main as of 2026-09-28
         with:
           open-issue: false
           open-pr: true

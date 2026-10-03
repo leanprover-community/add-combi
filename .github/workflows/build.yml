@@ -69,7 +69,7 @@ jobs:
       - name: Build project documentation
         if: github.ref == 'refs/heads/master'
         id: build-docgen
-        uses: leanprover-community/docgen-action@e731ee852903ea07cc5554357ff9e175af3578ab # main as of 2026-09-28
+        uses: leanprover-community/docgen-action@90cab778600b5fe01899f61a640ead757388cfd2 # main as of 2026-09-28
         with:
           blueprint: false
           homepage: "website"
