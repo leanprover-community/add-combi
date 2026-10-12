@@ -51,7 +51,7 @@ jobs:
 
       - name: Upstreaming dashboard
         if: github.ref == 'refs/heads/master'
-        uses: leanprover-community/upstreaming-dashboard-action@d1a9fcf87a66519bca3a0d3e3d233456b3e8d0d9 # main as of 2026-09-28
+        uses: leanprover-community/upstreaming-dashboard-action@cdeaeff56d9531a75a19e8b9106def00c588c688 # main as of 2026-10-12
         with:
           website-directory: ./website
           project-name: AddCombi
