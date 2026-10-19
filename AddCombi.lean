@@ -1,6 +1,7 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
 public import AddCombi.BSG
+public import AddCombi.Concentration.MarcinkiewiczZygmund
 public import AddCombi.Convolution.Finite.Defs
 public import AddCombi.Convolution.Finite.Order
 public import AddCombi.Mathlib.Algebra.BigOperators.Ring.Finset
