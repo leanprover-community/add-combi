@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.SpecialFunctions.Log.Basic
 public import Mathlib.Data.Finset.Powerset
+public import Mathlib.Data.Set.Sups
 public import Mathlib.Order.Interval.Set.Basic
 public import AddCombi.Mathlib.Analysis.Complex.Exponential
 public import AddCombi.Mathlib.Data.Set.Basic
@@ -48,6 +49,7 @@ and the Sauer-Shelah lemma for arbitrary set families.
 -/
 
 open Real
+open scoped SetFamily
 
 public section
 
@@ -183,10 +185,10 @@ lemma vcGrowth_union_le : vcGrowth n (𝒜 ∪ ℬ) ≤ vcGrowth n 𝒜 + vcGrow
   grw [Set.image_union, Set.ncard_union_le, ncard_image_inter_le_vcGrowth hA hAn,
     ncard_image_inter_le_vcGrowth hA hAn]
 
-lemma vcGrowth_image2_inter_le :
-    vcGrowth n (.image2 (· ∩ ·) 𝒜 ℬ) ≤ vcGrowth n 𝒜 * vcGrowth n ℬ := by
+lemma vcGrowth_infs_le : vcGrowth n (𝒜 ⊼ ℬ) ≤ vcGrowth n 𝒜 * vcGrowth n ℬ := by
   rw [vcGrowth_le_iff]
   rintro A hA hAn
+  change ((A ∩ ·) '' .image2 (· ∩ ·) 𝒜 ℬ).ncard ≤ _
   grw [Set.image_image2_distrib (Set.inter_inter_distrib_left _), Set.ncard_image2_le,
     ncard_image_inter_le_vcGrowth hA hAn, ncard_image_inter_le_vcGrowth hA hAn] <;>
       exact finite_image_inter hA

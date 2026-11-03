@@ -11,7 +11,7 @@ public section
 namespace Set
 variable {α : Type*} {A : Set α}
 
-/-- A finite set `A` has `∑ k ≤ d, A.ncard.choose k` subsets of size at most `d`. See also
+/-- A finite set `A` of size `n` has `∑ k ≤ d, n.choose k` subsets of size at most `d`. See also
 `Set.ncard_powerset_ncard`. -/
 lemma ncard_ofPred_ncard_le (hA : A.Finite) (d : ℕ) :
     {B ⊆ A | B.ncard ≤ d}.ncard = ∑ k ∈ .Iic d, A.ncard.choose k := by
