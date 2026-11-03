@@ -147,9 +147,13 @@ most `n`. -/
 noncomputable def vcGrowth : ℕ :=
   ⨆ A : {A : Set α // A.Finite ∧ A.ncard ≤ n}, ((↑A ∩ ·) '' 𝒜).ncard
 
-private lemma bddAbove_range :
-    BddAbove (.range fun A : {A : Set α // A.Finite ∧ A.ncard ≤ n} ↦ ((↑A ∩ ·) '' 𝒜).ncard) := by
-  use 2 ^ n
+private lemma finite_image_inter (hA : A.Finite) : ((A ∩ ·) '' 𝒜).Finite :=
+  hA.powerset.subset (by grind)
+
+lemma vcGrowth_le_iff {d : ℕ} :
+    vcGrowth n 𝒜 ≤ d ↔ ∀ ⦃A : Set α⦄, A.Finite → A.ncard ≤ n → ((A ∩ ·) '' 𝒜).ncard ≤ d := by
+  rw [vcGrowth, ciSup_le_iff' ⟨2 ^ n, ?_⟩]
+  · simp
   simp only [mem_upperBounds, Set.mem_range, Subtype.exists, exists_prop, forall_exists_index,
     and_imp, forall_comm (α := ℕ), forall_apply_eq_imp_iff₂]
   rintro A hA hAn
@@ -157,13 +161,6 @@ private lemma bddAbove_range :
   gcongr
   · exact hA.powerset
   · grind
-
-private lemma finite_image_inter (hA : A.Finite) : ((A ∩ ·) '' 𝒜).Finite :=
-  hA.powerset.subset (by grind)
-
-lemma vcGrowth_le_iff {d : ℕ} :
-    vcGrowth n 𝒜 ≤ d ↔ ∀ ⦃A : Set α⦄, A.Finite → A.ncard ≤ n → ((A ∩ ·) '' 𝒜).ncard ≤ d := by
-  simp [vcGrowth, ciSup_le_iff' bddAbove_range]
 
 lemma vcGrowth_lt_iff {d : ℕ} :
     vcGrowth n 𝒜 < d ↔ ∀ ⦃A : Set α⦄, A.Finite → A.ncard ≤ n → ((A ∩ ·) '' 𝒜).ncard < d := by
@@ -241,13 +238,39 @@ protected lemma Shatters.insert (h₀ : Shatters {C ∈ 𝒜 | x ∉ C} B)
     simp only [Set.inf_eq_inter] at hBC ⊢
     rw [Set.insert_inter_of_notMem hxC, hBC]
 
-private lemma exists_splitter (h : ((A ∩ ·) '' 𝒜).Nontrivial) :
-    ∃ x ∈ A, (∃ C ∈ 𝒜, x ∉ C) ∧ ∃ C ∈ 𝒜, x ∈ C := by
-  obtain ⟨t₁, ⟨C₁, hC₁, rfl⟩, t₂, ⟨C₂, hC₂, rfl⟩, hne⟩ := h
-  grind [Set.Subset.antisymm]
+/-- A trace of `𝒜` on `A` is determined by its restriction to the points whose singleton `𝒜`
+shatters: off those points, all traces agree. -/
+private lemma injOn_inter_ofPred_shatters_singleton :
+    Set.InjOn (· ∩ {x ∈ A | Shatters 𝒜 {x}}) ((A ∩ ·) '' 𝒜) := by
+  rintro t ⟨C, hC, rfl⟩ t' ⟨C', hC', rfl⟩ hIt
+  ext y
+  simp only [Set.ext_iff, Set.mem_inter_iff, Set.mem_ofPred_eq, shatters_singleton] at hIt
+  grind
 
-private lemma pajor_encard_aux (hfin : ((A ∩ ·) '' 𝒜).Finite) :
+/-- A family with infinitely many traces on `A` shatters infinitely many subsets of `A`. -/
+lemma infinite_ofPred_shatters (h : ((A ∩ ·) '' 𝒜).Infinite) :
+    {B | B ⊆ A ∧ Shatters 𝒜 B}.Infinite :=
+  .mono (by grind) <| .image Set.singleton_injective.injOn
+    fun hfin : {x ∈ A | Shatters 𝒜 {x}}.Finite ↦ h <| .of_finite_image
+      (hfin.powerset.subset <| by grind [-Set.image_image]) injOn_inter_ofPred_shatters_singleton
+
+/-- If only finitely many, say `k`, points of `A` have their singleton shattered by `𝒜`, then `𝒜`
+has at most `2 ^ k` traces on `A`. -/
+lemma ncard_image_inter_le_two_pow_ncard_shatters_singleton
+    (h : {x ∈ A | Shatters 𝒜 {x}}.Finite) :
+    ((A ∩ ·) '' 𝒜).ncard ≤ 2 ^ {x ∈ A | Shatters 𝒜 {x}}.ncard := by
+  rw [← Set.ncard_powerset _ h]
+  exact Set.ncard_le_ncard_of_injOn _ (fun _ _ ↦ Set.inter_subset_right)
+    injOn_inter_ofPred_shatters_singleton h.powerset
+
+/-- **Pajor's inequality**: the traces of `𝒜` on `A` are at most
+as many as the subsets of `A` shattered by `𝒜`. Since `encard` counts every infinite set as `⊤`,
+when there are infinitely many traces this says only that `𝒜` shatters infinitely many subsets
+of `A`. -/
+lemma encard_image_inter_le_encard_shatters :
     ((A ∩ ·) '' 𝒜).encard ≤ {B | B ⊆ A ∧ Shatters 𝒜 B}.encard := by
+  obtain hinf | hfin := ((A ∩ ·) '' 𝒜).infinite_or_finite
+  · simp [(infinite_ofPred_shatters hinf).encard_eq]
   induction hn : ((A ∩ ·) '' 𝒜).ncard using Nat.strong_induction_on generalizing 𝒜 with
   | _ N ih =>
   obtain hsub | hnt := ((A ∩ ·) '' 𝒜).subsingleton_or_nontrivial
@@ -255,7 +278,10 @@ private lemma pajor_encard_aux (hfin : ((A ∩ ·) '' 𝒜).Finite) :
     · simp
     · exact (Set.encard_le_one_iff_subsingleton.2 hsub).trans <|
         Set.one_le_encard_iff_nonempty.2 ⟨∅, Set.empty_subset A, shatters_bot.2 ⟨C, hC⟩⟩
-  · obtain ⟨x, hxA, ⟨C₂, hC₂, hxC₂⟩, C₁, hC₁, hxC₁⟩ := exists_splitter hnt
+  · obtain ⟨x, hxA, ⟨C₂, hC₂, hxC₂⟩, C₁, hC₁, hxC₁⟩ :
+        ∃ x ∈ A, (∃ C ∈ 𝒜, x ∉ C) ∧ ∃ C ∈ 𝒜, x ∈ C := by
+      obtain ⟨t₁, ⟨C₁, hC₁, rfl⟩, t₂, ⟨C₂, hC₂, rfl⟩, hne⟩ := hnt
+      grind [Set.Subset.antisymm]
     have hfin₀ : ((A ∩ ·) '' {C ∈ 𝒜 | x ∉ C}).Finite :=
       hfin.subset (Set.image_mono (Set.sep_subset _ _))
     have hfin₁ : ((A ∩ ·) '' {C ∈ 𝒜 | x ∈ C}).Finite :=
@@ -287,46 +313,6 @@ private lemma pajor_encard_aux (hfin : ((A ∩ ·) '' 𝒜).Finite) :
           · exact ⟨hBA, hB.mono (Set.sep_subset _ _)⟩
           · exact ⟨hBA, hB.mono (Set.sep_subset _ _)⟩
           · exact ⟨Set.insert_subset hxA hB'A, hB'₀.insert hB'₁⟩
-
-/-- A trace of `𝒜` on `A` is determined by its restriction to the points whose singleton `𝒜`
-shatters: off those points, all traces agree. -/
-private lemma injOn_inter_ofPred_shatters_singleton :
-    Set.InjOn (· ∩ {x ∈ A | Shatters 𝒜 {x}}) ((A ∩ ·) '' 𝒜) := by
-  rintro t ⟨C, hC, rfl⟩ t' ⟨C', hC', rfl⟩ hIt
-  ext y
-  simp only [Set.ext_iff, Set.mem_inter_iff, Set.mem_ofPred_eq, shatters_singleton] at hIt
-  grind
-
-/-- A family shattering finitely many singletons in `A` has finitely many traces on `A`. -/
-private lemma finite_image_inter_of_finite_ofPred_shatters_singleton
-    (h : {x ∈ A | Shatters 𝒜 {x}}.Finite) : ((A ∩ ·) '' 𝒜).Finite :=
-  .of_finite_image (h.powerset.subset (by grind [-Set.image_image]))
-    injOn_inter_ofPred_shatters_singleton
-
-/-- A family with infinitely many traces on `A` shatters infinitely many subsets of `A`. -/
-lemma infinite_ofPred_shatters (h : ((A ∩ ·) '' 𝒜).Infinite) :
-    {B | B ⊆ A ∧ Shatters 𝒜 B}.Infinite :=
-  .mono (by grind) <| .image Set.singleton_injective.injOn fun hfin ↦
-    h (finite_image_inter_of_finite_ofPred_shatters_singleton hfin)
-
-/-- If only finitely many, say `k`, points of `A` have their singleton shattered by `𝒜`, then `𝒜`
-has at most `2 ^ k` traces on `A`. -/
-lemma ncard_image_inter_le_two_pow_ncard_shatters_singleton
-    (h : {x ∈ A | Shatters 𝒜 {x}}.Finite) :
-    ((A ∩ ·) '' 𝒜).ncard ≤ 2 ^ {x ∈ A | Shatters 𝒜 {x}}.ncard := by
-  rw [← Set.ncard_powerset _ h]
-  exact Set.ncard_le_ncard_of_injOn _ (fun _ _ ↦ Set.inter_subset_right)
-    injOn_inter_ofPred_shatters_singleton h.powerset
-
-/-- **Pajor's inequality**: the traces of `𝒜` on `A` are at most
-as many as the subsets of `A` shattered by `𝒜`. Since `encard` counts every infinite set as `⊤`,
-when there are infinitely many traces this says only that `𝒜` shatters infinitely many subsets
-of `A`. -/
-lemma encard_image_inter_le_encard_shatters :
-    ((A ∩ ·) '' 𝒜).encard ≤ {B | B ⊆ A ∧ Shatters 𝒜 B}.encard := by
-  by_cases h : ((A ∩ ·) '' 𝒜).Finite
-  · exact pajor_encard_aux h
-  · simp [(infinite_ofPred_shatters h).encard_eq]
 
 /-- **Pajor's inequality** on a finite set `A`: the traces of `𝒜` on `A` are at most as many as
 the subsets of `A` that `𝒜` shatters. -/
