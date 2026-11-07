@@ -13,6 +13,7 @@ public import AddCombi.Mathlib.Analysis.Complex.Exponential
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
 public import AddCombi.Mathlib.Combinatorics.Additive.Sidon
 public import AddCombi.Mathlib.Combinatorics.SetFamily.VCDim
+public import AddCombi.Mathlib.Data.ENat.Choose
 public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card

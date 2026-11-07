@@ -7,6 +7,14 @@ public section
 namespace Set
 variable {α β γ : Type*} {f : α → β → γ} {s : Set α} {t : Set β} {k : ℕ}
 
+/-- A set has `encard` at most `c` if and only if all its finite subsets do. -/
+lemma encard_le_iff_forall_finite_subset {c : ℕ∞} :
+    s.encard ≤ c ↔ ∀ u ⊆ s, u.Finite → u.encard ≤ c where
+  mp h _ hus _ := (encard_le_encard hus).trans h
+  mpr h := ENat.forall_natCast_le_iff_le.1 fun _ hm ↦ by
+    obtain ⟨u, hus, hu⟩ := exists_subset_encard_eq hm
+    exact hu ▸ h u hus (finite_of_encard_eq_coe hu)
+
 lemma ncard_image2_le (hs : s.Finite) (ht : t.Finite) :
     (image2 f s t).ncard ≤ s.ncard * t.ncard := by
   grw [← image_uncurry_prod, ncard_image_le (hs.prod ht), ncard_prod]
