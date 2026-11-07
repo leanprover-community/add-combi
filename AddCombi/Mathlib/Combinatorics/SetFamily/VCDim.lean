@@ -13,7 +13,6 @@ public import AddCombi.Mathlib.Analysis.Complex.Exponential
 public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
-public import AddCombi.Mathlib.Data.Set.Image
 
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Tactic.Positivity
