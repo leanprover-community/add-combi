@@ -18,7 +18,7 @@ warn.sorry = false
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "14577ea482283da071a3e7e6eac0725e5eb4da97"
+rev = "c1cc962aa0ead632c537be6c1f5b24ebc5540bc1"
 
 [[lean_lib]]
 name = "AddCombi"
