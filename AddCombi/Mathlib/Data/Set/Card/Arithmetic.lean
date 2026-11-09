@@ -4,7 +4,6 @@ public import Mathlib.Algebra.Order.BigOperators.Group.LocallyFinite
 public import Mathlib.Data.Nat.Choose.Basic
 public import Mathlib.Data.Set.Finite.Powerset
 public import AddCombi.Mathlib.Data.Set.Card
-public import AddCombi.Mathlib.Order.Interval.Finset.Basic
 
 public section
 
