@@ -17,4 +17,3 @@ public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
-public import AddCombi.Mathlib.Order.Interval.Finset.Basic
