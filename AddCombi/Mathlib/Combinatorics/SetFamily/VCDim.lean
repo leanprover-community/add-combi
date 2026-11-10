@@ -13,7 +13,6 @@ public import AddCombi.Mathlib.Analysis.Complex.Exponential
 public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
-public import AddCombi.Mathlib.Data.Set.Image
 
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Tactic.Positivity
@@ -231,11 +230,9 @@ protected lemma Shatters.insert (h₀ : Shatters {C ∈ 𝒜 | x ∉ C} B)
   by_cases hxB' : x ∈ B'
   · obtain ⟨C, ⟨hC, hxC⟩, hBC⟩ := h₁ (show B' \ {x} ≤ B by grind)
     refine ⟨C, hC, ?_⟩
-    simp only [Set.inf_eq_inter] at hBC ⊢
     rw [Set.insert_inter_of_mem hxC, hBC, Set.insert_sdiff_singleton, Set.insert_eq_of_mem hxB']
   · obtain ⟨C, ⟨hC, hxC⟩, hBC⟩ := h₀ (show B' ≤ B by grind)
     refine ⟨C, hC, ?_⟩
-    simp only [Set.inf_eq_inter] at hBC ⊢
     rw [Set.insert_inter_of_notMem hxC, hBC]
 
 /-- A trace of `𝒜` on `A` is determined by its restriction to the points whose singleton `𝒜`
