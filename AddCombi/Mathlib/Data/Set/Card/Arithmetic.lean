@@ -11,19 +11,6 @@ public section
 namespace Set
 variable {α : Type*} {A : Set α}
 
-/-- A finite set `A` of size `n` has `∑ k ≤ d, n.choose k` subsets of size at most `d`. See also
-`Set.ncard_powerset_ncard`. -/
-lemma ncard_ofPred_ncard_le (hA : A.Finite) (d : ℕ) :
-    {B ⊆ A | B.ncard ≤ d}.ncard = ∑ k ∈ .Iic d, A.ncard.choose k := by
-  induction d with
-  | zero => simpa using ncard_powerset_ncard hA 0
-  | succ d ihd =>
-    simp_rw [Nat.le_add_one_iff, and_or_left, ofPred_or]
-    rw [ncard_union_eq ?_ ?_ ?_, ihd, ncard_powerset_ncard hA, Finset.sum_Iic_add_zero]
-    · grind
-    · exact hA.finite_subsets.subset fun _B hB ↦ hB.1
-    · exact hA.finite_subsets.subset fun _B hB ↦ hB.1
-
 /-- A finite set `A` has `A.encard.choose k` subsets of size `k`. -/
 private lemma Finite.encard_powerset_encard (hA : A.Finite) (k : ℕ) :
     {B ⊆ A | B.encard = k}.encard = A.encard.choose k := by
@@ -56,7 +43,7 @@ lemma encard_powerset_encard (A : Set α) (k : ℕ) :
           encard_le_encard fun B hB ↦ ⟨hB.1.trans hCA, hB.2⟩
 
 /-- Every set `A`, finite or infinite, has `∑ k ≤ d, A.encard.choose k` subsets of size at most
-`d`. See also `Set.ncard_ofPred_ncard_le`. -/
+`d`. See also `Set.encard_powerset_encard`. -/
 lemma encard_ofPred_encard_le (A : Set α) (d : ℕ) :
     {B ⊆ A | B.encard ≤ d}.encard = ∑ k ∈ .Iic d, A.encard.choose k := by
   induction d with
