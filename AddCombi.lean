@@ -19,4 +19,5 @@ public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 public import AddCombi.Mathlib.Data.Set.Prod
 public import AddCombi.VCDim.Additive.Defs
+public import AddCombi.VCDim.Additive.VCNDim
 public import AddCombi.VCDim.SetFamily.Defs
