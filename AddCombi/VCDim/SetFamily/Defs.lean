@@ -12,6 +12,8 @@ public import Mathlib.Data.Finset.Powerset
 public import Mathlib.Data.Set.Sups
 public import Mathlib.Order.Interval.Set.Basic
 
+import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib.Analysis.MeanInequalities
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Tactic.Positivity
 import Mathlib.Tactic.Simproc.ExistsAndEq
@@ -187,6 +189,29 @@ lemma vcGrowth_infs_le : vcGrowth n (𝒜 ⊼ ℬ) ≤ vcGrowth n 𝒜 * vcGrowt
     ncard_image_inter_le_vcGrowth hA hAn, ncard_image_inter_le_vcGrowth hA hAn] <;>
       exact finite_image_inter hA
 
+private lemma ncard_image_inter_image_compl (A : Set α) :
+    ((A ∩ ·) '' ((·ᶜ) '' 𝒜)).ncard = ((A ∩ ·) '' 𝒜).ncard := by
+  rw [Set.image_image, show (fun C ↦ A ∩ Cᶜ) = (A \ ·) ∘ (A ∩ ·) by
+    ext1 C; rw [Function.comp_apply, Set.sdiff_self_inter, Set.sdiff_eq], Set.image_comp]
+  refine Set.InjOn.ncard_image ?_
+  rintro _ ⟨C, -, rfl⟩ _ ⟨C', -, rfl⟩ h
+  ext x
+  simpa [Set.mem_sdiff, Set.mem_inter_iff, not_iff_not] using congr(x ∈ $h)
+
+@[simp] lemma vcGrowth_image_compl : vcGrowth n ((·ᶜ) '' 𝒜) = vcGrowth n 𝒜 := by
+  simp only [vcGrowth, ncard_image_inter_image_compl]
+
+@[simp] lemma vcGrowth_preimage_compl : vcGrowth n ((·ᶜ) ⁻¹' 𝒜) = vcGrowth n 𝒜 := by
+  rw [Set.preimage_compl_eq_image_compl, vcGrowth_image_compl]
+
+lemma vcGrowth_sups_le : vcGrowth n (𝒜 ⊻ ℬ) ≤ vcGrowth n 𝒜 * vcGrowth n ℬ := by
+  rw [vcGrowth_le_iff]
+  rintro A hA hAn
+  change ((A ∩ ·) '' .image2 (· ∪ ·) 𝒜 ℬ).ncard ≤ _
+  grw [Set.image_image2_distrib (Set.inter_union_distrib_left _), Set.ncard_image2_le,
+    ncard_image_inter_le_vcGrowth hA hAn, ncard_image_inter_le_vcGrowth hA hAn] <;>
+      exact finite_image_inter hA
+
 /-- A set family `𝒜` has VC dimension at most `d` if all the sets it shatters have size at most
 `d`. -/
 @[expose]
@@ -200,6 +225,15 @@ lemma HasVCDimLE.anti (hℬ𝒜 : ℬ ⊆ 𝒜) (hd : HasVCDimLE d 𝒜) : HasVC
 @[gcongr]
 lemma HasVCDimLE.mono (hd : d₁ ≤ d₂) : HasVCDimLE d₁ 𝒜 → HasVCDimLE d₂ 𝒜 := by
   grw [HasVCDimLE, HasVCDimLE, hd]; exact id
+
+@[simp] lemma hasVCDimLE_image_compl : HasVCDimLE d ((·ᶜ) '' 𝒜) ↔ HasVCDimLE d 𝒜 := by
+  simp [HasVCDimLE]
+
+@[simp] lemma hasVCDimLE_preimage_compl : HasVCDimLE d ((·ᶜ) ⁻¹' 𝒜) ↔ HasVCDimLE d 𝒜 := by
+  simp [HasVCDimLE]
+
+alias ⟨HasVCDimLE.of_image_compl, HasVCDimLE.image_compl⟩ := hasVCDimLE_image_compl
+alias ⟨HasVCDimLE.of_preimage_compl, HasVCDimLE.preimage_compl⟩ := hasVCDimLE_preimage_compl
 
 private lemma trace_sep_union :
     (A ∩ ·) '' {C ∈ 𝒜 | x ∉ C} ∪ (A ∩ ·) '' {C ∈ 𝒜 | x ∈ C} = (A ∩ ·) '' 𝒜 := by
@@ -367,6 +401,77 @@ most `d` is at most `(exp 1 / d * n) ^ d`, for `d ≤ n`. -/
 lemma HasVCDimLE.vcGrowth_le_exp (h𝒜 : HasVCDimLE d 𝒜) (hdn : d ≤ n) :
     (vcGrowth n 𝒜 : ℝ) ≤ (exp 1 / d * n) ^ d := by
   grw [h𝒜.vcGrowth_le, ← sum_choose_le_exp_pow hdn, Nat.range_succ_eq_Iic]; norm_cast
+
+/-- The numerical inequality behind `HasVCDimLE.infs`: the Sauer-Shelah bounds for VC dimension
+`d₁` and `d₂` at `N = 5 * (d₁ + d₂) + 1` multiply to less than `2 ^ N`. -/
+private lemma exp_div_mul_pow_mul_exp_div_mul_pow_lt (d₁ d₂ : ℕ) :
+    (exp 1 / d₁ * ↑(5 * (d₁ + d₂) + 1)) ^ d₁ * (exp 1 / d₂ * ↑(5 * (d₁ + d₂) + 1)) ^ d₂ <
+      (2 : ℝ) ^ (5 * (d₁ + d₂) + 1) := by
+  set D := d₁ + d₂ with hD
+  set N := 5 * D + 1
+  obtain hD₀ | hD₀ := D.eq_zero_or_pos
+  · obtain ⟨rfl, rfl⟩ : d₁ = 0 ∧ d₂ = 0 := by lia
+    norm_num
+  have hDR : (0 : ℝ) < D := mod_cast hD₀
+  set x := exp 1 / d₁ * N
+  set y := exp 1 / d₂ * N
+  have hx : 0 ≤ x := by positivity
+  have hy : 0 ≤ y := by positivity
+  have hw : (d₁ / D : ℝ) + d₂ / D = 1 := by rw [← add_div, ← Nat.cast_add, ← hD, div_self hDR.ne']
+  -- Each term of the arithmean is at most `exp 1 * N / D`, with equality unless `d = 0`.
+  have key (d : ℕ) : (d / D : ℝ) * (exp 1 / d * N) ≤ exp 1 * N / D := by
+    obtain rfl | hd := d.eq_zero_or_pos
+    · simp only [CharP.cast_eq_zero, zero_div, zero_mul]; positivity
+    · exact le_of_eq (by field_simp)
+  have hexp : exp (1 / 5) < 2 := by
+    refine lt_of_pow_lt_pow_left₀ 5 zero_le_two ?_
+    rw [← exp_nat_mul]
+    norm_num
+    linarith [exp_one_lt_d9]
+  have hpow {z : ℝ} (hz : 0 ≤ z) (d : ℕ) : z ^ d = (z ^ (d / D : ℝ)) ^ D := by
+    rw [← rpow_natCast (z ^ _), ← rpow_mul hz, div_mul_cancel₀ _ hDR.ne', rpow_natCast]
+  calc x ^ d₁ * y ^ d₂
+      = (x ^ (d₁ / D : ℝ) * y ^ (d₂ / D : ℝ)) ^ D := by rw [hpow hx d₁, hpow hy d₂, ← mul_pow]
+    _ ≤ (d₁ / D * x + d₂ / D * y) ^ D := by
+        gcongr; exact geom_mean_le_arith_mean2_weighted (by positivity) (by positivity) hx hy hw
+    _ ≤ (2 * (exp 1 * N / D)) ^ D := by gcongr; linarith [key d₁, key d₂]
+    _ = (10 * exp 1) ^ D * (1 + 1 / (5 * D)) ^ D := by
+        rw [← mul_pow]; congr 1; simp only [N]; push_cast; field_simp; ring
+    _ ≤ 32 ^ D * exp (1 / 5) := by
+        gcongr
+        · linarith [exp_one_lt_d9]
+        · calc (1 + 1 / (5 * D) : ℝ) ^ D
+              ≤ exp (1 / (5 * D)) ^ D := by gcongr; linarith [add_one_le_exp (1 / (5 * D : ℝ))]
+            _ = exp (1 / 5) := by rw [← exp_nat_mul]; congr 1; field_simp
+    _ < 32 ^ D * 2 := by gcongr
+    _ = 2 ^ N := by rw [pow_succ, pow_mul]; norm_num
+
+/-- If the growth function of `𝒞` is bounded by the product of those of `𝒜` and `ℬ`, and `𝒜` and
+`ℬ` have VC dimension at most `d₁` and `d₂` respectively, then `𝒞` has VC dimension at most
+`5 * (d₁ + d₂)`. -/
+private lemma HasVCDimLE.of_vcGrowth_le_mul {𝒞 : Set (Set α)} (h𝒜 : HasVCDimLE d₁ 𝒜)
+    (hℬ : HasVCDimLE d₂ ℬ) (h𝒞 : ∀ n, vcGrowth n 𝒞 ≤ vcGrowth n 𝒜 * vcGrowth n ℬ) :
+    HasVCDimLE (5 * (d₁ + d₂)) 𝒞 := by
+  rintro A hA hshat
+  have hAd := exp_div_mul_pow_mul_exp_div_mul_pow_lt d₁ d₂
+  contrapose! hAd
+  obtain ⟨B, hBA, hB, hBN⟩ := Set.exists_subset_ncard_eq (k := 5 * (d₁ + d₂) + 1) hAd
+  calc (2 : ℝ) ^ (5 * (d₁ + d₂) + 1)
+      = 2 ^ B.ncard := by rw [hBN]
+    _ ≤ ((B ∩ ·) '' 𝒞).ncard := mod_cast (shatters_iff_le_ncard_image_inter hB).1 (hshat.subset hBA)
+    _ ≤ vcGrowth (5 * (d₁ + d₂) + 1) 𝒞 := mod_cast ncard_image_inter_le_vcGrowth hB hBN.le
+    _ ≤ vcGrowth (5 * (d₁ + d₂) + 1) 𝒜 * vcGrowth (5 * (d₁ + d₂) + 1) ℬ := mod_cast h𝒞 _
+    _ ≤ _ := by grw [h𝒜.vcGrowth_le_exp (by lia), hℬ.vcGrowth_le_exp (by lia)]
+
+/-- If `𝒜` and `ℬ` have VC dimension at most `d₁` and `d₂` respectively, then `𝒜 ⊼ ℬ` has VC
+dimension at most `5 * (d₁ + d₂)`. -/
+lemma HasVCDimLE.infs (h𝒜 : HasVCDimLE d₁ 𝒜) (hℬ : HasVCDimLE d₂ ℬ) :
+    HasVCDimLE (5 * (d₁ + d₂)) (𝒜 ⊼ ℬ) := h𝒜.of_vcGrowth_le_mul hℬ fun _ ↦ vcGrowth_infs_le
+
+/-- If `𝒜` and `ℬ` have VC dimension at most `d₁` and `d₂` respectively, then `𝒜 ⊻ ℬ` has VC
+dimension at most `5 * (d₁ + d₂)`. -/
+lemma HasVCDimLE.sups (h𝒜 : HasVCDimLE d₁ 𝒜) (hℬ : HasVCDimLE d₂ ℬ) :
+    HasVCDimLE (5 * (d₁ + d₂)) (𝒜 ⊻ ℬ) := h𝒜.of_vcGrowth_le_mul hℬ fun _ ↦ vcGrowth_sups_le
 
 variable [Infinite α]
 
