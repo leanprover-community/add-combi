@@ -5,14 +5,12 @@ Authors: Yaël Dillies
 -/
 module
 
+public import AddCombi.Mathlib.Data.Set.Basic
+public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 public import Mathlib.Analysis.SpecialFunctions.Log.Basic
 public import Mathlib.Data.Finset.Powerset
 public import Mathlib.Data.Set.Sups
 public import Mathlib.Order.Interval.Set.Basic
-public import AddCombi.Mathlib.Analysis.Complex.Exponential
-public import AddCombi.Mathlib.Data.Set.Basic
-public import AddCombi.Mathlib.Data.Set.Card
-public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 
 import Mathlib.Order.Lattice.Nat
 import Mathlib.Tactic.Positivity
@@ -368,14 +366,7 @@ lemma HasVCDimLE.vcGrowth_le (h𝒜 : HasVCDimLE d 𝒜) :
 most `d` is at most `(exp 1 / d * n) ^ d`, for `d ≤ n`. -/
 lemma HasVCDimLE.vcGrowth_le_exp (h𝒜 : HasVCDimLE d 𝒜) (hdn : d ≤ n) :
     (vcGrowth n 𝒜 : ℝ) ≤ (exp 1 / d * n) ^ d := by
-  obtain rfl | hd := Nat.eq_zero_or_pos d
-  · rw [pow_zero]
-    exact mod_cast (h𝒜.vcGrowth_le (n := n)).trans_eq (by simp)
-  · calc (vcGrowth n 𝒜 : ℝ)
-        ≤ ((∑ k ∈ .Iic d, n.choose k : ℕ) : ℝ) := Nat.cast_le.2 h𝒜.vcGrowth_le
-      _ = ∑ k ∈ Finset.range (d + 1), (n.choose k : ℝ) := by
-          rw [Nat.range_succ_eq_Iic]; push_cast; rfl
-      _ ≤ (exp 1 / d * n) ^ d := sum_choose_le_exp_pow d n hd hdn
+  grw [h𝒜.vcGrowth_le, ← sum_choose_le_exp_pow hdn, Nat.range_succ_eq_Iic]; norm_cast
 
 variable [Infinite α]
 
@@ -408,7 +399,7 @@ lemma hasVCDimLE_iff_vcGrowth : HasVCDimLE d 𝒜 ↔ vcGrowth (d + 1) 𝒜 < 2 
   · rintro h A hA hA𝒜
     contrapose! h
     rw [← Nat.add_one_le_iff] at h
-    obtain ⟨B, hBA, hB, hBd⟩ := Set.exists_subset_ncard_eq hA h
+    obtain ⟨B, hBA, hB, hBd⟩ := Set.exists_subset_ncard_eq h
     refine ⟨B, hB, hBd, ?_⟩
     grw [← hBd, ← shatters_iff_le_ncard_image_inter hB, hBA]
     exact hA𝒜
