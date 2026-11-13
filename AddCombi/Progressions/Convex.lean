@@ -39,6 +39,9 @@ distinct.
   lattice points of `𝒦` if and only if its terms with indices in `𝒦` are distinct.
 * `IsProperConvexProgressionWith.anti`: If `𝒦` contains `0`, then being `t₂`-proper with convex body
   `𝒦` implies being `t₁`-proper with convex body `𝒦` for all `0 ≤ t₁ ≤ t₂`.
+* `image_convexProgressionTerm_add_image`: The sumset of the terms `convexProgressionTerm a v ℓ₁`
+  with `ℓ₁ ∈ s₁` and `convexProgressionTerm b v ℓ₂` with `ℓ₂ ∈ s₂` is the finset of the terms
+  `convexProgressionTerm (a + b) v (ℓ₁ + ℓ₂)`.
 * `nsmul_image_convexProgressionTerm`: The `t`-fold sumset of the terms with base point `a` and
   indices in a finset `s` is the finset of the terms with base point `t • a` and indices in the
   `t`-fold sumset `t • s`.
@@ -104,6 +107,17 @@ end ConvexBody
 
 variable [DecidableEq G] {P : Finset G}
 
+/-- The sumset of the terms `convexProgressionTerm a v ℓ₁` with `ℓ₁ ∈ s₁` and the terms
+`convexProgressionTerm b v ℓ₂` with `ℓ₂ ∈ s₂` is the finset of the terms
+`convexProgressionTerm (a + b) v (ℓ₁ + ℓ₂)`. -/
+lemma image_convexProgressionTerm_add_image (a b : G) (v : Fin d → G)
+    (s₁ s₂ : Finset (Fin d → ℤ)) :
+    s₁.image (convexProgressionTerm a v) + s₂.image (convexProgressionTerm b v) =
+      (s₁ + s₂).image (convexProgressionTerm (a + b) v) := by
+  change image₂ (· + ·) (image _ _) (image _ _) = image _ (image₂ (· + ·) _ _)
+  rw [image₂_image_left, image₂_image_right, image_image₂]
+  simp [convexProgressionTerm_add]
+
 /-- The `t`-fold sumset of the terms with base point `a` and indices in a finset `s` is the finset
 of the terms with base point `t • a` and indices in the `t`-fold sumset `t • s`. -/
 lemma nsmul_image_convexProgressionTerm (t : ℕ) (a : G) (v : Fin d → G)
@@ -112,10 +126,7 @@ lemma nsmul_image_convexProgressionTerm (t : ℕ) (a : G) (v : Fin d → G)
   induction t with
   | zero => ext; simp [convexProgressionTerm]
   | succ t ih =>
-    rw [succ_nsmul, ih, succ_nsmul s]
-    change image₂ (· + ·) (image _ _) (image _ _) = image _ (image₂ (· + ·) _ _)
-    rw [image₂_image_left, image₂_image_right, image_image₂]
-    simp [succ_nsmul, convexProgressionTerm_add]
+    rw [succ_nsmul, ih, succ_nsmul s, succ_nsmul a, image_convexProgressionTerm_add_image]
 
 /-- The convex progression in an additive commutative group `G` with base point `a`, basis vectors
 `v` and convex body `𝒦` is the finset of the terms `convexProgressionTerm a v ℓ` over the lattice
