@@ -4,6 +4,7 @@ public import AddCombi.BSG
 public import AddCombi.Concentration.MarcinkiewiczZygmund
 public import AddCombi.Convolution.Finite.Defs
 public import AddCombi.Convolution.Finite.Order
+public import AddCombi.GAP.Basic
 public import AddCombi.Mathlib.Algebra.BigOperators.Ring.Finset
 public import AddCombi.Mathlib.Algebra.Group.Action.Pointwise.Set.Basic
 public import AddCombi.Mathlib.Algebra.Group.Pointwise.Set.Basic
