@@ -1,6 +1,7 @@
 module  -- shake: keep-all --deprecated_module: ignore
 
 public import AddCombi.BSG
+public import AddCombi.Concentration.MarcinkiewiczZygmund
 public import AddCombi.Convolution.Finite.Defs
 public import AddCombi.Convolution.Finite.Order
 public import AddCombi.Mathlib.Algebra.BigOperators.Ring.Finset
@@ -19,6 +20,8 @@ public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.Set.Basic
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 public import AddCombi.Mathlib.Data.Set.Prod
+public import AddCombi.Mathlib.Probability.IdentDistrib
+public import AddCombi.Mathlib.Probability.Independence.Basic
 public import AddCombi.VCDim.Additive.Defs
 public import AddCombi.VCDim.Additive.VCNDim
 public import AddCombi.VCDim.SetFamily.Defs
