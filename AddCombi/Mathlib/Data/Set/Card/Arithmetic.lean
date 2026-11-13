@@ -1,10 +1,12 @@
 module
 
-public import Mathlib.Algebra.Order.BigOperators.Group.LocallyFinite
-public import Mathlib.Data.Nat.Choose.Basic
-public import Mathlib.Data.Set.Finite.Powerset
+public import Mathlib.Data.Set.Card
+public import Mathlib.Order.Interval.Finset.Nat
 public import AddCombi.Mathlib.Data.ENat.Choose
-public import AddCombi.Mathlib.Data.Set.Card
+
+import Mathlib.Algebra.Order.BigOperators.Group.LocallyFinite
+import Mathlib.Data.Set.Finite.Powerset
+import AddCombi.Mathlib.Data.Set.Card
 
 public section
 
