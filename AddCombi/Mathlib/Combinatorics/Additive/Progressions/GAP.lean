@@ -5,10 +5,8 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import AddCombi.Progressions.Convex
+public import AddCombi.Mathlib.Combinatorics.Additive.Progressions.Convex
 public import Mathlib.Algebra.Group.Pointwise.Finset.Scalar
-public import Mathlib.Algebra.Order.Pi
-public import Mathlib.Data.Pi.Interval
 
 /-!
 # Generalized arithmetic progressions
@@ -28,7 +26,6 @@ remains proper after its dimensions are multiplied by `t`.
 
 ## Main definitions
 
-* `ConvexBody.box L`: The box of the `x : Fin d → ℝ` with `0 ≤ x` and `x i ≤ L i` for all `i`.
 * `generalizedAP a v L`: The generalized arithmetic progression with base point `a`, basis vectors
   `v` and dimensions `L`.
 * `IsGAP d P`: The finset `P` is a generalized arithmetic progression of rank `d`.
@@ -72,61 +69,6 @@ open scoped Pointwise
 
 variable {G : Type*} [AddCommGroup G] [DecidableEq G] {d t t₁ t₂ : ℕ} {a x : G} {v : Fin d → G}
   {L : Fin d → ℕ} {P : Finset G}
-
-namespace ConvexBody
-
-/-- The box with dimensions `L` is the convex body of the `x : Fin d → ℝ` with `0 ≤ x` and
-`x i ≤ L i` for all `i`. -/
-@[expose]
-def box (L : Fin d → ℕ) : ConvexBody (Fin d → ℝ) where
-  carrier := Set.Icc 0 fun i ↦ (L i : ℝ)
-  convex' := convex_Icc ..
-  isCompact' := isCompact_Icc
-  nonempty' := Set.nonempty_Icc.2 fun _ ↦ by simp
-
-@[simp]
-lemma coe_box (L : Fin d → ℕ) : (box L : Set (Fin d → ℝ)) = Set.Icc 0 fun i ↦ (L i : ℝ) := rfl
-
-@[simp]
-lemma zero_mem_box (L : Fin d → ℕ) : 0 ∈ box L := by
-  simp [← SetLike.mem_coe, Pi.le_def]
-
-/-- The lattice points of the box with dimensions `L` are the `ℓ : Fin d → ℤ` with `0 ≤ ℓ` and
-`ℓ i ≤ L i` for all `i`. -/
-@[simp]
-lemma latticePoints_box (L : Fin d → ℕ) : (box L).latticePoints = Icc 0 fun i ↦ (L i : ℤ) := by
-  ext ℓ
-  rw [mem_latticePoints, ← SetLike.mem_coe, coe_box]
-  simp only [Set.mem_Icc, mem_Icc, Pi.le_def, Pi.zero_apply]
-  norm_cast
-
-/-- Scaling the box with dimensions `L` by `t` gives the box with dimensions `t • L`. -/
-@[simp]
-lemma natCast_smul_box (t : ℕ) (L : Fin d → ℕ) : (t : ℝ) • box L = box (t • L) := by
-  ext x
-  obtain rfl | ht := t.eq_zero_or_pos
-  · simp [Set.zero_smul_set, Pi.le_def, ← Pi.zero_def]
-  · simp [Set.mem_smul_set_iff_inv_smul_mem₀, ht.ne', Pi.le_def, inv_mul_le_iff₀, ht]
-
-private lemma latticePoints_box_add (L₁ L₂ : Fin d → ℕ) :
-    (box L₁).latticePoints + (box L₂).latticePoints = (box (L₁ + L₂)).latticePoints := by
-  ext ℓ
-  simp only [mem_add, latticePoints_box, mem_Icc, Pi.le_def, Pi.zero_apply, Pi.add_apply]
-  constructor
-  · rintro ⟨ℓ₁, h₁, ℓ₂, h₂, rfl⟩
-    grind [Pi.add_apply]
-  · rintro ⟨h₀, h⟩
-    refine ⟨fun i ↦ min (ℓ i) (L₁ i), by grind, fun i ↦ ℓ i - min (ℓ i) (L₁ i), by grind, ?_⟩
-    ext i
-    simp
-
-private lemma nsmul_latticePoints_box (t : ℕ) (L : Fin d → ℕ) :
-    t • (box L).latticePoints = (box (t • L)).latticePoints := by
-  induction t with
-  | zero => ext; simp [← Pi.zero_def]
-  | succ t ih => rw [succ_nsmul, ih, succ_nsmul L, latticePoints_box_add]
-
-end ConvexBody
 
 /-- The generalized arithmetic progression in an additive commutative group `G` with base point
 `a`, basis vectors `v` and dimensions `L` is the convex progression with base point `a`, basis

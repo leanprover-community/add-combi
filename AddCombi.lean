@@ -12,9 +12,12 @@ public import AddCombi.Mathlib.Algebra.Notation.Indicator
 public import AddCombi.Mathlib.Algebra.Order.GroupWithZero.Indicator
 public import AddCombi.Mathlib.Algebra.Star.Pi
 public import AddCombi.Mathlib.Analysis.Complex.Exponential
+public import AddCombi.Mathlib.Analysis.Convex.Body
 public import AddCombi.Mathlib.Combinatorics.Additive.ApproximateSubgroup
 public import AddCombi.Mathlib.Combinatorics.Additive.CovBySMul
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
+public import AddCombi.Mathlib.Combinatorics.Additive.Progressions.Convex
+public import AddCombi.Mathlib.Combinatorics.Additive.Progressions.GAP
 public import AddCombi.Mathlib.Combinatorics.Additive.Sidon
 public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.Set.Basic
@@ -22,8 +25,6 @@ public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 public import AddCombi.Mathlib.Data.Set.Prod
 public import AddCombi.Mathlib.Probability.IdentDistrib
 public import AddCombi.Mathlib.Probability.Independence.Basic
-public import AddCombi.Progressions.Arithmetic
-public import AddCombi.Progressions.Convex
 public import AddCombi.VCDim.Additive.Defs
 public import AddCombi.VCDim.Additive.VCNDim
 public import AddCombi.VCDim.SetFamily.Defs

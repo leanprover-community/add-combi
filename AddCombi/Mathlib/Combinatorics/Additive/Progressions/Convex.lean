@@ -5,7 +5,7 @@ Authors: Gabriel Dahia
 -/
 module
 
-public import Mathlib.Analysis.Convex.Body
+public import AddCombi.Mathlib.Analysis.Convex.Body
 
 /-!
 # Convex progressions
@@ -23,8 +23,6 @@ distinct.
 
 * `convexProgressionTerm a v ℓ`: The term `a + ∑ i, ℓ i • v i` of index `ℓ` of the convex
   progressions with base point `a` and basis vectors `v`.
-* `ConvexBody.latticePoints 𝒦`: The finset of the lattice points `ℓ : Fin d → ℤ` of the convex body
-  `𝒦` in `Fin d → ℝ`.
 * `convexProgression a v 𝒦`: The convex progression with base point `a`, basis vectors `v` and
   convex body `𝒦`.
 * `IsConvexProgressionWith 𝒦 P`: The finset `P` is a convex progression with convex body `𝒦`.
@@ -57,7 +55,7 @@ open Finset
 open scoped Pointwise
 
 variable {G : Type*} [AddCommGroup G] {d : ℕ} {a x : G} {v : Fin d → G}
-  {𝒦 : ConvexBody (Fin d → ℝ)} {ℓ : Fin d → ℤ}
+  {𝒦 : ConvexBody (Fin d → ℝ)}
 
 /-- The term of index `ℓ` of the convex progressions in an additive commutative group `G` with base
 point `a` and basis vectors `v` is the sum `a + ∑ i, ℓ i • v i`. -/
@@ -73,37 +71,6 @@ lemma convexProgressionTerm_add (a b : G) (v : Fin d → G) (ℓ₁ ℓ₂ : Fin
 lemma injOn_convexProgressionTerm_iff (a b : G) {s : Set (Fin d → ℤ)} :
     Set.InjOn (convexProgressionTerm a v) s ↔ Set.InjOn (convexProgressionTerm b v) s := by
   simp [Set.InjOn, convexProgressionTerm]
-
-namespace ConvexBody
-
-private lemma finite_setOf_intCast_mem (𝒦 : ConvexBody (Fin d → ℝ)) :
-    {ℓ : Fin d → ℤ | (fun i ↦ (ℓ i : ℝ)) ∈ 𝒦}.Finite :=
-  ((Topology.IsClosedEmbedding.piMap fun _ ↦ Int.isClosedEmbedding_coe_real).isCompact_preimage
-    𝒦.isCompact).finite_of_discrete
-
-/-- The lattice points of a convex body `𝒦` in `Fin d → ℝ` are the `ℓ : Fin d → ℤ` that lie in `𝒦`.
-They form a finset because `𝒦` is compact. -/
-noncomputable def latticePoints (𝒦 : ConvexBody (Fin d → ℝ)) : Finset (Fin d → ℤ) :=
-  𝒦.finite_setOf_intCast_mem.toFinset
-
-@[simp]
-lemma mem_latticePoints : ℓ ∈ 𝒦.latticePoints ↔ (fun i ↦ (ℓ i : ℝ)) ∈ 𝒦 := by
-  simp [latticePoints]
-
-@[simp]
-lemma latticePoints_zero_smul (𝒦 : ConvexBody (Fin d → ℝ)) :
-    ((0 : ℝ) • 𝒦).latticePoints = {0} := by
-  ext ℓ
-  rw [mem_latticePoints, ← SetLike.mem_coe, coe_smul, Set.zero_smul_set 𝒦.nonempty]
-  simp [funext_iff]
-
-lemma latticePoints_mono {𝒦₁ 𝒦₂ : ConvexBody (Fin d → ℝ)} (h : 𝒦₁ ≤ 𝒦₂) :
-    𝒦₁.latticePoints ⊆ 𝒦₂.latticePoints := by
-  intro ℓ hℓ
-  rw [mem_latticePoints] at *
-  exact h hℓ
-
-end ConvexBody
 
 variable [DecidableEq G] {P : Finset G}
 
