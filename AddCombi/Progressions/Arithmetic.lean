@@ -43,9 +43,9 @@ remains proper after its dimensions are multiplied by `t`.
   `∏ i, (L i + 1)` if and only if its terms with indices in `ConvexBody.box L` are distinct.
 * `nsmul_generalizedAP`: The `t`-fold sumset of `generalizedAP a v L` is
   `generalizedAP (t • a) v (t • L)`.
-* `IsGAP.add`, `IsGAP.sum`, `IsGAP.neg`, `IsGAP.sub`, `IsGAP.sub_self`, `IsGAP.image` and
-  `IsGAP.vadd`: Sumsets, negations, difference sets, images under additive homomorphisms and
-  translates of generalized arithmetic progressions are generalized arithmetic progressions.
+* `IsGAP.add`, `IsGAP.sum`, `IsGAP.neg`, `IsGAP.sub_self` and `IsGAP.vadd`: Sumsets, negations,
+  difference sets `P - P` and translates of generalized arithmetic progressions are generalized
+  arithmetic progressions.
 * `isGAP_sum_pair`: The subset sums of a family `v : Fin d → G` form a generalized arithmetic
   progression of rank `d`.
 * `isProperGAP_iff_exists_card_nsmul`: A generalized arithmetic progression `P` is `t`-proper if
@@ -207,15 +207,6 @@ lemma neg_generalizedAP (a : G) (v : Fin d → G) (L : Fin d → ℕ) :
     simp [convexProgressionTerm, sub_smul, sum_sub_distrib]
     abel
 
-/-- The image of the generalized arithmetic progression with base point `a`, basis vectors `v` and
-dimensions `L` under an additive homomorphism `f` is the generalized arithmetic progression with
-base point `f a`, basis vectors `f ∘ v` and dimensions `L`. -/
-lemma image_generalizedAP {H : Type*} [AddCommGroup H] [DecidableEq H] (f : G →+ H) (a : G)
-    (v : Fin d → G) (L : Fin d → ℕ) :
-    (generalizedAP a v L).image f = generalizedAP (f a) (f ∘ v) L := by
-  ext x
-  simp [map_sum]
-
 /-- The translate by `c` of the generalized arithmetic progression with base point `a`, basis
 vectors `v` and dimensions `L` is the generalized arithmetic progression with base point `c + a`,
 basis vectors `v` and dimensions `L`. -/
@@ -342,27 +333,12 @@ lemma IsGAP.neg (hP : IsGAP d P) : IsGAP d (-P) := by
   rw [neg_generalizedAP]
   exact isGAP_generalizedAP ..
 
-/-- The difference set of generalized arithmetic progressions of ranks `d₁` and `d₂` is a
-generalized arithmetic progression of rank `d₁ + d₂`. -/
-lemma IsGAP.sub {d₁ d₂ : ℕ} {Q : Finset G} (hP : IsGAP d₁ P) (hQ : IsGAP d₂ Q) :
-    IsGAP (d₁ + d₂) (P - Q) := by
-  rw [sub_eq_add_neg]
-  exact hP.add hQ.neg
-
 /-- The difference set `P - P` of a generalized arithmetic progression `P` of rank `d` is a
 generalized arithmetic progression of rank `d`, with the same basis vectors and twice the
 dimensions. -/
 lemma IsGAP.sub_self (hP : IsGAP d P) : IsGAP d (P - P) := by
   obtain ⟨L, a, v, rfl⟩ := isGAP_iff_exists_eq_generalizedAP.1 hP
   rw [sub_eq_add_neg, neg_generalizedAP, generalizedAP_add_generalizedAP]
-  exact isGAP_generalizedAP ..
-
-/-- The image of a generalized arithmetic progression of rank `d` under an additive homomorphism is
-a generalized arithmetic progression of rank `d`. -/
-lemma IsGAP.image {H : Type*} [AddCommGroup H] [DecidableEq H] (hP : IsGAP d P) (f : G →+ H) :
-    IsGAP d (P.image f) := by
-  obtain ⟨L, a, v, rfl⟩ := isGAP_iff_exists_eq_generalizedAP.1 hP
-  rw [image_generalizedAP]
   exact isGAP_generalizedAP ..
 
 /-- A translate of a generalized arithmetic progression of rank `d` is a generalized arithmetic
