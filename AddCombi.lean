@@ -16,8 +16,10 @@ public import AddCombi.Mathlib.Combinatorics.Additive.ApproximateSubgroup
 public import AddCombi.Mathlib.Combinatorics.Additive.CovBySMul
 public import AddCombi.Mathlib.Combinatorics.Additive.Energy
 public import AddCombi.Mathlib.Combinatorics.Additive.Sidon
+public import AddCombi.Mathlib.Data.ENat.Choose
 public import AddCombi.Mathlib.Data.Finset.Density
 public import AddCombi.Mathlib.Data.Set.Basic
+public import AddCombi.Mathlib.Data.Set.Card
 public import AddCombi.Mathlib.Data.Set.Card.Arithmetic
 public import AddCombi.Mathlib.Data.Set.Prod
 public import AddCombi.Mathlib.Probability.IdentDistrib
