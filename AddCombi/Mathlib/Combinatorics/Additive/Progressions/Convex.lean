@@ -10,39 +10,24 @@ public import AddCombi.Mathlib.Analysis.Convex.Body
 /-!
 # Convex progressions
 
-A finset in an additive commutative group `G` is a convex progression of rank `d` if there exist a
-base point `a : G`, basis vectors `v : Fin d → G` and a convex body `𝒦` in `Fin d → ℝ` such that its
-elements are the sums `a + ∑ i, ℓ i • v i` over the lattice points `ℓ : Fin d → ℤ` of `𝒦`.
-
-A finset is a proper convex progression if there exist such `a`, `v` and `𝒦` for which these sums
-are distinct. It is a `t`-proper convex progression for a real number `t` if there exist such `a`,
-`v` and `𝒦` for which the sums `a + ∑ i, ℓ i • v i` over the lattice points `ℓ` of `t • 𝒦` are
-distinct.
+A convex progression in an abelian group `G` is given by a dimension `dim`, an `origin : G`, a
+homomorphism `hom : (Fin dim → ℤ) →+ G` and a convex body `body` in `Fin dim → ℝ`. Its points are
+`origin + hom v` with `v` a lattice point of `body`. We write `x ∈ P` when `x` is a point of `P`,
+and `P.toFinset` is the finset of its points when `G` has decidable equality. It is `t`-proper,
+written `P.Proper t`, when `hom` is injective on the lattice points of `t • body`.
 
 ## Main definitions
 
-* `convexProgressionTerm a v ℓ`: The term `a + ∑ i, ℓ i • v i` of index `ℓ` of the convex
-  progressions with base point `a` and basis vectors `v`.
-* `convexProgression a v 𝒦`: The convex progression with base point `a`, basis vectors `v` and
-  convex body `𝒦`.
-* `IsConvexProgressionWith 𝒦 P`: The finset `P` is a convex progression with convex body `𝒦`.
-* `IsConvexProgression d P`: The finset `P` is a convex progression of rank `d`.
-* `IsProperConvexProgressionWith t 𝒦 P`: The finset `P` is a `t`-proper convex progression with
-  convex body `𝒦`.
-* `IsProperConvexProgression t d P`: The finset `P` is a `t`-proper convex progression of rank `d`.
+* `ConvexProgression G`: a convex progression in `G`.
+* `ConvexProgression.toFinset`: the finset of points.
+* `ConvexProgression.Proper t`: `hom` is injective on the lattice points of `t • body`.
 
 ## Main statements
 
-* `card_convexProgression_eq_iff`: The cardinality of `convexProgression a v 𝒦` is the number of
-  lattice points of `𝒦` if and only if its terms with indices in `𝒦` are distinct.
-* `IsProperConvexProgressionWith.anti`: If `𝒦` contains `0`, then being `t₂`-proper with convex body
-  `𝒦` implies being `t₁`-proper with convex body `𝒦` for all `0 ≤ t₁ ≤ t₂`.
-* `image_convexProgressionTerm_add_image`: The sumset of the terms `convexProgressionTerm a v ℓ₁`
-  with `ℓ₁ ∈ s₁` and `convexProgressionTerm b v ℓ₂` with `ℓ₂ ∈ s₂` is the finset of the terms
-  `convexProgressionTerm (a + b) v (ℓ₁ + ℓ₂)`.
-* `nsmul_image_convexProgressionTerm`: The `t`-fold sumset of the terms with base point `a` and
-  indices in a finset `s` is the finset of the terms with base point `t • a` and indices in the
-  `t`-fold sumset `t • s`.
+* `ConvexProgression.proper_one_iff_card_toFinset`: a convex progression is `1`-proper if and only
+  if it has as many points as its body has lattice points.
+* `ConvexProgression.Proper.mono`: if the body contains `0`, then being `b`-proper implies being
+  `a`-proper for all `0 ≤ a ≤ b`.
 
 ## Tags
 
@@ -54,135 +39,78 @@ public section
 open Finset
 open scoped Pointwise
 
-variable {G : Type*} [AddCommGroup G] {d : ℕ} {a x : G} {v : Fin d → G}
-  {𝒦 : ConvexBody (Fin d → ℝ)}
+/-- A convex progression: the set of the points `origin + hom v` with `v` a lattice point of
+`body`. -/
+structure ConvexProgression (G : Type*) [AddCommGroup G] where
+  /-- The dimension of the ambient lattice. -/
+  dim : ℕ
+  /-- The base point. -/
+  origin : G
+  /-- The homomorphism from the lattice to `G`. -/
+  hom : (Fin dim → ℤ) →+ G
+  /-- The convex body whose lattice points parametrize the progression. -/
+  body : ConvexBody (Fin dim → ℝ)
 
-/-- The term of index `ℓ` of the convex progressions in an additive commutative group `G` with base
-point `a` and basis vectors `v` is the sum `a + ∑ i, ℓ i • v i`. -/
+namespace ConvexProgression
+
+variable {G : Type*} [AddCommGroup G] {P : ConvexProgression G}
+
+/-- The points of a convex progression are the `origin + hom v` with `v` a lattice point of
+`body`. -/
+instance : Membership G (ConvexProgression G) where
+  mem P x := ∃ v ∈ P.body.latticePoints, P.origin + P.hom v = x
+
+lemma mem_def {x : G} : x ∈ P ↔ ∃ v ∈ P.body.latticePoints, P.origin + P.hom v = x := .rfl
+
+/-- The finset of points of a convex progression. -/
 @[expose]
-def convexProgressionTerm (a : G) (v : Fin d → G) (ℓ : Fin d → ℤ) : G := a + ∑ i, ℓ i • v i
+noncomputable def toFinset [DecidableEq G] (P : ConvexProgression G) : Finset G :=
+  P.body.latticePoints.image fun v ↦ P.origin + P.hom v
 
-lemma convexProgressionTerm_add (a b : G) (v : Fin d → G) (ℓ₁ ℓ₂ : Fin d → ℤ) :
-    convexProgressionTerm (a + b) v (ℓ₁ + ℓ₂) =
-      convexProgressionTerm a v ℓ₁ + convexProgressionTerm b v ℓ₂ := by
-  simp [convexProgressionTerm, add_smul, sum_add_distrib, add_add_add_comm]
+section Finset
 
-/-- Whether the terms with indices in `s` are distinct does not depend on the base point. -/
-lemma injOn_convexProgressionTerm_iff (a b : G) {s : Set (Fin d → ℤ)} :
-    Set.InjOn (convexProgressionTerm a v) s ↔ Set.InjOn (convexProgressionTerm b v) s := by
-  simp [Set.InjOn, convexProgressionTerm]
-
-variable [DecidableEq G] {P : Finset G}
-
-/-- The sumset of the terms `convexProgressionTerm a v ℓ₁` with `ℓ₁ ∈ s₁` and the terms
-`convexProgressionTerm b v ℓ₂` with `ℓ₂ ∈ s₂` is the finset of the terms
-`convexProgressionTerm (a + b) v (ℓ₁ + ℓ₂)`. -/
-lemma image_convexProgressionTerm_add_image (a b : G) (v : Fin d → G)
-    (s₁ s₂ : Finset (Fin d → ℤ)) :
-    s₁.image (convexProgressionTerm a v) + s₂.image (convexProgressionTerm b v) =
-      (s₁ + s₂).image (convexProgressionTerm (a + b) v) := by
-  change image₂ (· + ·) (image _ _) (image _ _) = image _ (image₂ (· + ·) _ _)
-  rw [image₂_image_left, image₂_image_right, image_image₂]
-  simp [convexProgressionTerm_add]
-
-/-- The `t`-fold sumset of the terms with base point `a` and indices in a finset `s` is the finset
-of the terms with base point `t • a` and indices in the `t`-fold sumset `t • s`. -/
-lemma nsmul_image_convexProgressionTerm (t : ℕ) (a : G) (v : Fin d → G)
-    (s : Finset (Fin d → ℤ)) :
-    t • s.image (convexProgressionTerm a v) = (t • s).image (convexProgressionTerm (t • a) v) := by
-  induction t with
-  | zero => ext; simp [convexProgressionTerm]
-  | succ t ih =>
-    rw [succ_nsmul, ih, succ_nsmul s, succ_nsmul a, image_convexProgressionTerm_add_image]
-
-/-- The convex progression in an additive commutative group `G` with base point `a`, basis vectors
-`v` and convex body `𝒦` is the finset of the terms `convexProgressionTerm a v ℓ` over the lattice
-points `ℓ` of `𝒦`. -/
-@[expose]
-noncomputable def convexProgression (a : G) (v : Fin d → G) (𝒦 : ConvexBody (Fin d → ℝ)) :
-    Finset G :=
-  𝒦.latticePoints.image (convexProgressionTerm a v)
+variable [DecidableEq G]
 
 @[simp]
-lemma mem_convexProgression :
-    x ∈ convexProgression a v 𝒦 ↔ ∃ ℓ ∈ 𝒦.latticePoints, convexProgressionTerm a v ℓ = x := by
-  simp [convexProgression]
+lemma mem_toFinset {x : G} : x ∈ P.toFinset ↔ x ∈ P := by
+  simp [toFinset, mem_def]
 
-/-- The cardinality of a convex progression is the number of lattice points of its convex body if
-and only if its terms with indices in the convex body are distinct. -/
-lemma card_convexProgression_eq_iff :
-    #(convexProgression a v 𝒦) = #𝒦.latticePoints ↔
-      Set.InjOn (convexProgressionTerm a v) 𝒦.latticePoints :=
-  card_image_iff
+@[simp, norm_cast]
+lemma coe_toFinset (P : ConvexProgression G) : (P.toFinset : Set G) = {x | x ∈ P} :=
+  Set.ext fun _ ↦ mem_toFinset
 
-/-- A finset `P` in an additive commutative group `G` is a convex progression with convex body `𝒦`
-in `Fin d → ℝ` if it is `convexProgression a v 𝒦` for some base point `a : G` and basis vectors
-`v : Fin d → G`. -/
+/-- A convex progression has at most as many points as its body has lattice points. -/
+lemma card_toFinset_le (P : ConvexProgression G) : #P.toFinset ≤ #P.body.latticePoints :=
+  card_image_le
+
+end Finset
+
+/-- A convex progression is `t`-proper if `hom` is injective on the lattice points of
+`t • body`. -/
 @[expose]
-def IsConvexProgressionWith (𝒦 : ConvexBody (Fin d → ℝ)) (P : Finset G) : Prop :=
-  ∃ (a : G) (v : Fin d → G), P = convexProgression a v 𝒦
+def Proper (t : ℝ) (P : ConvexProgression G) : Prop := Set.InjOn P.hom (t • P.body).latticePoints
 
-/-- A finset `P` in an additive commutative group `G` is a convex progression of rank `d` if it is
-a convex progression with some convex body `𝒦` in `Fin d → ℝ`. -/
-@[expose]
-def IsConvexProgression (d : ℕ) (P : Finset G) : Prop :=
-  ∃ 𝒦 : ConvexBody (Fin d → ℝ), IsConvexProgressionWith 𝒦 P
+/-- A convex progression is `1`-proper if and only if it has as many points as its body has lattice
+points. -/
+lemma proper_one_iff_card_toFinset [DecidableEq G] :
+    P.Proper 1 ↔ #P.toFinset = #P.body.latticePoints := by
+  rw [Proper, one_smul, toFinset, card_image_iff]
+  simp [Set.InjOn]
 
-/-- A finset `P` in an additive commutative group `G` is a `t`-proper convex progression with convex
-body `𝒦` in `Fin d → ℝ` if it is `convexProgression a v 𝒦` for some base point `a : G` and basis
-vectors `v : Fin d → G` such that the terms `convexProgressionTerm a v ℓ` over the lattice points
-`ℓ` of `t • 𝒦` are distinct.
-
-A proper convex progression is a `1`-proper one. -/
-@[expose]
-def IsProperConvexProgressionWith (t : ℝ) (𝒦 : ConvexBody (Fin d → ℝ)) (P : Finset G) : Prop :=
-  ∃ (a : G) (v : Fin d → G),
-    Set.InjOn (convexProgressionTerm a v) (t • 𝒦).latticePoints ∧ P = convexProgression a v 𝒦
-
-/-- A finset `P` in an additive commutative group `G` is a `t`-proper convex progression of rank `d`
-if it is a `t`-proper convex progression with some convex body `𝒦` in `Fin d → ℝ`. -/
-@[expose]
-def IsProperConvexProgression (t : ℝ) (d : ℕ) (P : Finset G) : Prop :=
-  ∃ 𝒦 : ConvexBody (Fin d → ℝ), IsProperConvexProgressionWith t 𝒦 P
-
-lemma IsConvexProgressionWith.isConvexProgression (hP : IsConvexProgressionWith 𝒦 P) :
-    IsConvexProgression d P :=
-  ⟨𝒦, hP⟩
-
-lemma IsProperConvexProgressionWith.isConvexProgressionWith {t : ℝ}
-    (hP : IsProperConvexProgressionWith t 𝒦 P) : IsConvexProgressionWith 𝒦 P := by
-  obtain ⟨a, v, -, rfl⟩ := hP
-  exact ⟨a, v, rfl⟩
-
-lemma IsProperConvexProgressionWith.isProperConvexProgression {t : ℝ}
-    (hP : IsProperConvexProgressionWith t 𝒦 P) : IsProperConvexProgression t d P :=
-  ⟨𝒦, hP⟩
-
-lemma IsProperConvexProgression.isConvexProgression {t : ℝ}
-    (hP : IsProperConvexProgression t d P) : IsConvexProgression d P := by
-  obtain ⟨𝒦, hP⟩ := hP
-  exact ⟨𝒦, hP.isConvexProgressionWith⟩
-
-/-- If the convex body `𝒦` contains `0`, then being `t₂`-proper with convex body `𝒦` implies being
-`t₁`-proper with convex body `𝒦` for all `0 ≤ t₁ ≤ t₂`. -/
-lemma IsProperConvexProgressionWith.anti {t₁ t₂ : ℝ} (h𝒦 : 0 ∈ 𝒦) (ht₁ : 0 ≤ t₁) (ht : t₁ ≤ t₂)
-    (hP : IsProperConvexProgressionWith t₂ 𝒦 P) : IsProperConvexProgressionWith t₁ 𝒦 P := by
-  obtain ⟨a, v, hinj, rfl⟩ := hP
-  refine ⟨a, v, hinj.mono ?_, rfl⟩
-  lift t₂ to NNReal using ht₁.trans ht
-  lift t₁ to NNReal using ht₁
-  exact coe_subset.2 <| ConvexBody.latticePoints_mono <| 𝒦.smul_le_of_le h𝒦 <|
-    NNReal.coe_le_coe.1 ht
-
-/-- Every convex progression with convex body `𝒦` is `0`-proper with convex body `𝒦`, because `0` is
-the only lattice point of `0 • 𝒦`. -/
+/-- Every convex progression is `0`-proper, because `0` is the only lattice point of
+`0 • body`. -/
 @[simp]
-lemma isProperConvexProgressionWith_zero :
-    IsProperConvexProgressionWith 0 𝒦 P ↔ IsConvexProgressionWith 𝒦 P := by
-  simp [IsProperConvexProgressionWith, IsConvexProgressionWith, Set.InjOn]
+lemma proper_zero (P : ConvexProgression G) : P.Proper 0 := by
+  simp [Proper]
 
-/-- Every convex progression is `0`-proper. -/
-@[simp]
-lemma isProperConvexProgression_zero :
-    IsProperConvexProgression 0 d P ↔ IsConvexProgression d P := by
-  simp [IsProperConvexProgression, IsConvexProgression]
+/-- If the body contains `0`, then being `b`-proper implies being `a`-proper for all
+`0 ≤ a ≤ b`. -/
+lemma Proper.mono (h₀ : 0 ∈ P.body) {a b : ℝ} (ha : 0 ≤ a) (hab : a ≤ b) (h : P.Proper b) :
+    P.Proper a := by
+  refine Set.InjOn.mono ?_ h
+  lift b to NNReal using ha.trans hab
+  lift a to NNReal using ha
+  exact coe_subset.2 <| ConvexBody.latticePoints_mono <| P.body.smul_le_of_le h₀ <|
+    NNReal.coe_le_coe.1 hab
+
+end ConvexProgression
