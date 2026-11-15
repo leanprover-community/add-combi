@@ -66,6 +66,14 @@ jobs:
           sudo apt install graphviz -y
           ~/.elan/bin/lake exe graph website/file_deps.pdf
 
+      # On the Ubuntu 26.04 runner image, Lake's thread stacks reserve so much
+      # address space during the doc build that the kernel's default overcommit
+      # heuristic refuses to spawn `git` for doc-gen4's `srcUri.github` facets
+      # ("resource exhausted (error code: 12, not enough memory)").
+      - name: Allow Lake to spawn processes during the doc build
+        if: github.ref == 'refs/heads/master'
+        run: sudo sysctl -w vm.overcommit_memory=1
+
       - name: Build project documentation
         if: github.ref == 'refs/heads/master'
         id: build-docgen
