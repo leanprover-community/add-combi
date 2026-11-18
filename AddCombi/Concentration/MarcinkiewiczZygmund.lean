@@ -15,6 +15,7 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import Mathlib.Data.Nat.Choose.Multinomial
 import Mathlib.MeasureTheory.Function.SpecialFunctions.Inner
 import Mathlib.MeasureTheory.Integral.Prod
+import Mathlib.Probability.IdentDistribIndep
 import Mathlib.Tactic.Positivity.Finset
 
 /-!
