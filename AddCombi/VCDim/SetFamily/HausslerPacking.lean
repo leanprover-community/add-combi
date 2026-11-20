@@ -8,7 +8,6 @@ module
 public import AddCombi.VCDim.SetFamily.Defs
 public import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 
-import AddCombi.Mathlib.Analysis.Complex.Exponential
 import Mathlib.MeasureTheory.Constructions.Pi
 import Mathlib.MeasureTheory.Measure.Real
 import Mathlib.Tactic.Positivity.Finset
@@ -79,7 +78,7 @@ lemma exists_card_le_injOn_inter (h𝓕 : ∀ A ∈ 𝓕, MeasurableSet A)
         obtain ⟨hA, hB, hAB⟩ := Finset.mem_offDiag.1 hp
         rw [Measure.real, Measure.pi_pi, ENNReal.toReal_prod, Finset.prod_const, Finset.card_univ,
           Fintype.card_fin, ← Measure.real, ← neg_mul,
-          probReal_compl_eq_one_sub ((h𝓕 _ hA).symmDiff (h𝓕 _ hB)), mul_comm, exp_nat_mul]
+          probReal_compl_eq_one_sub ((h𝓕 _ hA).symmDiff (h𝓕 _ hB)), mul_comm, exp_natCast_mul]
         gcongr
         · linarith [measureReal_le_one (μ := μ) (s := p.1 ∆ p.2)]
         · linarith [hsep hA hB hAB, one_sub_le_exp_neg ε]
