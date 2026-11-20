@@ -71,7 +71,7 @@ lemma hasMulVCNDimLE_zero : HasMulVCNDimLE A 0 d ↔ A = ∅ ∨ A = .univ where
     beta_reduce
     split_ifs with hs
     · simp_all
-    · rw [← ne_eq, ← Set.nonempty_iff_ne_empty] at hs
+    · rw [← ne_eq, Set.ne_empty_iff_nonempty] at hs
       obtain ⟨z, hz⟩ := hs
       simp_all [Subsingleton.elim z finZeroElim]
   mpr := by simp +contextual [or_imp]

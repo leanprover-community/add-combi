@@ -37,7 +37,7 @@ lemma indicator_one_apply_ne_zero : 𝟭_[s, M₀] a ≠ 0 ↔ a ∈ s := by
 @[simp high] lemma indicator_one_eq_zero : 𝟭_[s, M₀] = 0 ↔ s = ∅ := by
   simp [funext_iff, eq_empty_iff_forall_notMem]
 
-lemma indicator_one_ne_zero : 𝟭_[s, M₀] ≠ 0 ↔ s.Nonempty := by simp [nonempty_iff_ne_empty]
+lemma indicator_one_ne_zero : 𝟭_[s, M₀] ≠ 0 ↔ s.Nonempty := by simp
 
 variable (M₀) in
 @[simp high] lemma support_indicator_one : 𝟭_[s, M₀].support = s := by
