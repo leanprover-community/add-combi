@@ -425,7 +425,7 @@ private lemma exp_div_mul_pow_mul_exp_div_mul_pow_lt (d₁ d₂ : ℕ) :
     · exact le_of_eq (by field_simp)
   have hexp : exp (1 / 5) < 2 := by
     refine lt_of_pow_lt_pow_left₀ 5 zero_le_two ?_
-    rw [← exp_nat_mul]
+    rw [← exp_ofNat_mul]
     norm_num
     linarith [exp_one_lt_d9]
   have hpow {z : ℝ} (hz : 0 ≤ z) (d : ℕ) : z ^ d = (z ^ (d / D : ℝ)) ^ D := by
@@ -442,7 +442,7 @@ private lemma exp_div_mul_pow_mul_exp_div_mul_pow_lt (d₁ d₂ : ℕ) :
         · linarith [exp_one_lt_d9]
         · calc (1 + 1 / (5 * D) : ℝ) ^ D
               ≤ exp (1 / (5 * D)) ^ D := by gcongr; linarith [add_one_le_exp (1 / (5 * D : ℝ))]
-            _ = exp (1 / 5) := by rw [← exp_nat_mul]; congr 1; field_simp
+            _ = exp (1 / 5) := by rw [← exp_natCast_mul]; congr 1; field_simp
     _ < 32 ^ D * 2 := by gcongr
     _ = 2 ^ N := by rw [pow_succ, pow_mul]; norm_num
 
