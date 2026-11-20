@@ -404,7 +404,7 @@ theorem marcinkiewicz_zygmund_symmetric {p : ℝ≥0} (iIndepFun_X : iIndepFun X
   have integrable_εX (ε : A → Bool) :
       Integrable (fun ω ↦ ‖∑ i, σ (ε i) • X i ω‖ ^ (p : ℝ)) μ := by
     have : MemLp (fun ω ↦ ∑ i : A, σ (ε i) • X i ω) p μ :=
-      memLp_finsetSum _ fun i _ ↦ (memLp_X i i.2).const_smul _
+      memLp_finsetSum _ fun i _ ↦ (memLp_X i i.property).const_smul _
     simpa using this.integrable_norm_rpow'
   calc
     ∫ ω, ‖∑ i ∈ A, X i ω‖ ^ (p : ℝ) ∂μ
@@ -440,7 +440,7 @@ theorem marcinkiewicz_zygmund [CompleteSpace E] {p : ℝ≥0} (hp : 1 ≤ p) (iI
   have one_le_p : (1 : ℝ≥0∞) ≤ p := mod_cast hp
   -- Restrict to the finite index type `A`.
   let Z (i : A) : Ω → E := X i
-  have memLp_Z (i : A) : MemLp (Z i) p μ := memLp_X i i.2
+  have memLp_Z (i : A) : MemLp (Z i) p μ := memLp_X i i.property
   -- Symmetrise: Let `Z' i (ω, ω') = Z i ω - Z i ω'`.
   let Z' (i : A) (ω : Ω × Ω) : E := Z i ω.1 - Z i ω.2
   have memLp_Z' (i : A) : MemLp (Z' i) p (μ.prod μ) :=
@@ -494,7 +494,7 @@ theorem marcinkiewicz_zygmund [CompleteSpace E] {p : ℝ≥0} (hp : 1 ≤ p) (iI
         _ = ‖∫ ω', ∑ i, Z' i (ω, ω') ∂μ‖ ^ (p : ℝ) := by rw [integral_sum]
         _ ≤ ∫ ω', ‖∑ i, Z' i (ω, ω')‖ ^ (p : ℝ) ∂μ :=
           convexOn_norm_rpow.map_integral_le (g := fun x : E ↦ ‖x‖ ^ (p : ℝ))
-            (continuous_norm.rpow_const fun _ ↦ .inr p.2).continuousOn isClosed_univ
+            (continuous_norm.rpow_const fun _ ↦ .inr p.property).continuousOn isClosed_univ
             (.of_forall fun _ ↦ Set.mem_univ _) (memLp_sum.integrable one_le_p)
             (by simpa [Function.comp_def] using memLp_sum.integrable_norm_rpow')
     -- Apply the Marcinkiewicz-Zygmund inequality for symmetric random variables to `Z'`.
