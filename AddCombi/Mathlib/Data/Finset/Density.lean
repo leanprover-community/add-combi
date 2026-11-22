@@ -3,6 +3,8 @@ module
 public import Mathlib.Data.Finset.Density
 public import Mathlib.Data.Fintype.Prod
 
+import Mathlib.Data.Rat.Cast.CharZero
+
 public section
 
 namespace Finset
