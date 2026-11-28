@@ -363,14 +363,17 @@ lemma HasVCDimLE.ncard_le_of_shatters (h𝒜 : HasVCDimLE d 𝒜) (hB : Shatters
 /-- The Sauer-Shelah count, from a bound on the shattered subsets of `A` alone. -/
 private lemma ncard_image_inter_le_of_forall_ncard_le (hA : A.Finite) (hAn : A.ncard ≤ n)
     (h : ∀ B ⊆ A, Shatters 𝒜 B → B.ncard ≤ d) :
-    ((A ∩ ·) '' 𝒜).ncard ≤ ∑ k ∈ .Iic d, n.choose k :=
-  calc ((A ∩ ·) '' 𝒜).ncard
-      ≤ {B | B ⊆ A ∧ Shatters 𝒜 B}.ncard := ncard_image_inter_le_ncard_shatters hA
-    _ ≤ {B | B ⊆ A ∧ B.ncard ≤ d}.ncard :=
-        Set.ncard_le_ncard (fun _B hB ↦ ⟨hB.1, h _ hB.1 hB.2⟩)
-          (hA.finite_subsets.subset fun _B hB ↦ hB.1)
-    _ = ∑ k ∈ .Iic d, A.ncard.choose k := Set.ncard_ofPred_ncard_le hA d
-    _ ≤ ∑ k ∈ .Iic d, n.choose k := by gcongr
+    ((A ∩ ·) '' 𝒜).ncard ≤ ∑ k ∈ .Iic d, n.choose k := by
+  refine (Set.encard_le_coe_iff_finite_ncard_le.1 ?_).2
+  calc ((A ∩ ·) '' 𝒜).encard
+      ≤ {B | B ⊆ A ∧ Shatters 𝒜 B}.encard := encard_image_inter_le_encard_shatters
+    _ ≤ {B | B ⊆ A ∧ B.encard ≤ d}.encard := Set.encard_le_encard fun B hB ↦
+        ⟨hB.1, Set.encard_le_coe_iff_finite_ncard_le.2 ⟨hA.subset hB.1, h B hB.1 hB.2⟩⟩
+    _ = ∑ k ∈ .Iic d, A.encard.choose k := Set.encard_ofPred_encard_le A d
+    _ ≤ (∑ k ∈ .Iic d, n.choose k : ℕ) := by
+        push_cast
+        gcongr
+        exact Set.encard_le_coe_iff_finite_ncard_le.2 ⟨hA, hAn⟩
 
 /-- **The Sauer-Shelah inequality**: a family of VC dimension at most `d` traces at most
 `∑ k ≤ d, n.choose k` sets on any finite set of size at most `n`. -/
