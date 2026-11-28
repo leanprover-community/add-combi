@@ -39,7 +39,7 @@ omit [Fintype α] in
 lemma oneOfPair_aux (hH : H ⊆ X ×ˢ X) : #{yz ∈ H | yz.1 = x} = #{c ∈ X | (x, c) ∈ H} := by
   refine card_nbij' Prod.snd (fun c ↦ (x, c)) ?_ (by simp [Set.MapsTo])
     (by grind [Set.LeftInvOn]) (by simp [Set.LeftInvOn])
-  simpa +contextual [Set.MapsTo, eq_comm] using fun a b hab _ ↦ (mem_product.1 (hH hab)).2
+  simpa +contextual [Set.MapsTo] using fun x hx ↦ (mem_product.1 (hH hx)).2
 
 noncomputable def oneOfPair (H : Finset (α × α)) (X : Finset α) : Finset α :=
   {x ∈ X | (3 / 4 : ℝ) * X.dens ≤ {c ∈ X | (x, c) ∈ H}.dens}
